@@ -3,6 +3,12 @@
 # dependencies
 node_modules/
 
+#android
+android/
+
+#program data
+%ProgramData%
+
 # Expo
 .expo/
 dist/
