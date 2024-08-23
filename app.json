@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "task-up",
+    "name": "Task Up!",
     "slug": "task-up",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -21,10 +21,16 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.turb0code.taskup"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "6d2dffa0-7c12-4ee4-b20b-bd46bd683045"
+      }
     }
   }
 }
