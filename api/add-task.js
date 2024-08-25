@@ -1,17 +1,3 @@
-import { TodoistApi } from '@doist/todoist-api-typescript';
-
-// const getToken = async () => {
-//     const tokenFileUri = FileSystem.documentDirectory + "token.json";
-//     const fileContents = await FileSystem.readAsStringAsync(tokenFileUri, { encoding: FileSystem.EncodingType.UTF8 });
-//     const jsonData = JSON.parse(fileContents);
-//     console.log("TOKEN:");
-//     console.log(jsonData["token"]);
-//     return jsonData["token"];
-// }
-
-// getToken();
-// export const api = new TodoistApi(getToken());
-
 export const apiAddTask = (api, task) => {
     api.addTask({
         content: task.title,

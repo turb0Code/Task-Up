@@ -16,109 +16,122 @@ import TasksContext from '../Tasks.js';
 
 const TimelineComponent = ({ route }) => {
 
+  // THEME
   let { darkMode, setDarkMode } = React.useContext(DarkMode);
   let theme = useTheme();
 
+  // API
   let api = {};
   getApi().then(a => {
     api = a;
   });
 
+  // TODAY DATE
   let todayDate = new Date();
   todayDate.setHours(0, 0, 0, 0);
 
-  let {tasks, setTasks} = React.useContext(TasksContext);
+  // TAGS
   let apiTags = React.useContext(TagsContext);
   let tags = apiTags;
 
-  // DELETE/EDIT MENU TRIGGERED
-  const [filter, setFilter] = useState("");
+  // TASKS AND FILTERS
+  let {tasks, setTasks} = React.useContext(TasksContext);
 
+  const [filter, setFilter] = useState("");  // currently picked filter
 
   if (filter != "" && tasks.length > 0 )
   {
     tasks = tasks.filter(t => { if (t.labels.includes(filter)) { return t; } });
   }
-  tasks = timelineArrange(tasks);
-  console.log(tags);
+  tasks = timelineArrange(tasks);  // prepares tasks to be displayed in timeline
 
-
-  const snapPoints = React.useMemo(() => ['57%'], []);
-  const bottomSheetModalRef = React.useRef(null);
-  const editSheetModalRef = React.useRef(null);
-
-  const [addVisible, setAddVisible] = useState(false);
-  const [completeVisible, setCompleteVisible] = useState(false);
-  const [deleteVisible, setDeleteVisible] = useState(false);
-  const [addTask, setAddTask] = useState(false);
-  let [taskToEdit, setTaskToEdit] = useState({});
-  let [addTaskDate, setAddTaskDate] = useState(new Date());
-  let [menusVisible, setMenusVisible] = React.useState(new Array(20).fill(false));
-  console.log(menusVisible.length);
-
-  const addNewTask = () => {
-    bottomSheetModalRef.current?.present();
-    setAddTask(true);
-
-  }
-
-  const toogleAddSnackBar = () => {
-    setAddVisible(true);
-    setTimeout(() => {
-      setAddVisible(false);
-    }, 3000);
-  }
-
-  const deleteT = (id) => {
-    setDeleteVisible(true);
-    deleteTask(api, id);
-    setTimeout(() => {
-      route.params.reloadTasks();
-    }, 1000)
-    setTimeout(() => {
-      setDeleteVisible(false);
-    }, 3000);
-  }
-
-  const complete = (id) => {
-    setCompleteVisible(true);
-    completeTask(api, id);
-    setTimeout(() => {
-      route.params.reloadTasks();
-    }, 1000)
-    setTimeout(() => {
-      setCompleteVisible(false);
-    }, 3000);
-  }
-
+  // all tasks divided to groups for timeline
   let overdue = tasks[0];
   let today = tasks[1];
   let future = tasks[2];
 
+  // VARIABLES FOR ADD AND EDIT CARDS
+  const snapPoints = React.useMemo(() => ['57%'], []);
+  const bottomSheetModalRef = React.useRef(null);
+  const editSheetModalRef = React.useRef(null);
+
+  // VISIBILITY OF SNACKBARS
+  const [addVisible, setAddVisible] = useState(false);
+  const [completeVisible, setCompleteVisible] = useState(false);
+  const [deleteVisible, setDeleteVisible] = useState(false);
+
+  // ADDING TASK
+  const [addTask, setAddTask] = useState(false);
+  let [addTaskDate, setAddTaskDate] = useState(new Date());
+
+  // EDITING TASK
+  let [taskToEdit, setTaskToEdit] = useState({});
+
+  // VISIBILITY OF MENUS
+  let [menusVisible, setMenusVisible] = React.useState(new Array(20).fill(false));  // TODO: this length should be equal to number of tasks
+
+  // function shows card to add task
+  const addNewTask = () => {
+    bottomSheetModalRef.current?.present();
+    setAddTask(true);
+  }
+
+  const toogleAddSnackBar = () => {
+    setAddVisible(true);
+
+    setTimeout(() => { setAddVisible(false); }, 3000);
+  }
+
+  // function invokes deleting task on server by id
+  const deleteT = (id) => {
+    setDeleteVisible(true);
+    deleteTask(api, id);
+
+    setTimeout(() => { route.params.reloadTasks(); }, 1000)
+
+    setTimeout(() => { setDeleteVisible(false); }, 3000);
+  }
+
+  // frontend function to complete task on server by id
+  const complete = (id) => {
+    setCompleteVisible(true);
+    completeTask(api, id);
+
+    setTimeout(() => { route.params.reloadTasks(); }, 1000)
+
+    setTimeout(() => { setCompleteVisible(false); }, 3000);
+  }
+
+  // function calulates number of days between next future tasks
+  // and inserts empty day object in those gaps
   const calculateGaps = () => {
     todayDate = new Date();
+
     future = future.flatMap(tasks => {
       let futureDayGaps = [];
-      let date = new Date(tasks[1].date);
-      let daysDifference = Math.ceil(Math.abs(date - todayDate) / (1000 * 60 * 60 * 24));
+      let date = new Date(tasks[1].date);  // geting task date
+      let daysDifference = Math.ceil(Math.abs(date - todayDate) / (1000 * 60 * 60 * 24));  // calculaing days difference
 
       if (daysDifference > 1) {
         for (let i = 1; i < daysDifference; i++) {
           let gapDate = new Date(todayDate);
           gapDate.setDate(gapDate.getDate() + i);
-          futureDayGaps.push({time: gapDate.toLocaleDateString('en-US', {weekday: 'short', day: 'numeric', month: 'short'}), normalDate: gapDate});
+
+          futureDayGaps.push({time: gapDate.toLocaleDateString('en-US', {weekday: 'short', day: 'numeric', month: 'short'}), normalDate: gapDate});  // add day object into gap
         }
-        todayDate = new Date(tasks[1].date);
+
+        todayDate = new Date(tasks[1].date);  // assign task date as previous date
         return [futureDayGaps, [...tasks]];
       }
 
-      todayDate = new Date(tasks[1].date);
+      todayDate = new Date(tasks[1].date);  // assign task date as previous date
       return [tasks];
     });
   }
 
-  calculateGaps();
+  calculateGaps();  // calling funtion to prepare tasklist
 
+  // function to render circle next to task in timeline
   const renderCircle = (rowData, sectionID, rowID, darkTheme) => {
 
     let circleColor = {}
@@ -159,6 +172,7 @@ const TimelineComponent = ({ route }) => {
     );
   }
 
+  // function to handle rendering task in timeline
   const renderTask = (rowData, sectionID, rowID, darkTheme) => {
 
     let theme = {
@@ -183,53 +197,76 @@ const TimelineComponent = ({ route }) => {
     if (rowData.description == "") {
       return(
         <Menu visible={menusVisible[rowData.index]} onDismiss={() => { menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); }} anchor={
+
           <TouchableRipple style={{flex:1, marginTop: sectionID == 0 ? 1 : 0}} onLongPress={() => { menusVisible[rowData.index] = true; setMenusVisible([...menusVisible]); }}>
             <>
+
             <View style={{flex:1, marginTop:-11}}>
               <View style={{ display: "flex", flexDirection: "row" }}>
+
                 <Text style={{ fontWeight: 'bold', color: theme.grey1, marginRight: 3}}>{rowData.time}</Text>
                 <View style={{ marginTop: sectionID == 0 ? 0 : -2, height: 25, borderRadius: 8, backgroundColor: chipBgColor, paddingHorizontal: 6, paddingVertical: 0, minWidth: 25, display: "flex", justifyContent: "center" }}>
+
                   {
                     "event" in rowData ?
                       <Text variant="labelMedium" style={{ fontWeight: "bold", color: "#000" }}>EVENT</Text> :
                       <Icon size={22} source={rowData.priority == "1" ? "roman-numeral-1" : rowData.priority == "2" ? "roman-numeral-2" : rowData.priority == "3" ? "roman-numeral-3" : "roman-numeral-4"} color="#000"></Icon>
                   }
+
                 </View>
               </View>
+
               <Text style={{ fontWeight: 'bold' }} variant="titleLarge">{rowData.title}</Text>
+
               { rowData.tags.map((tag, index)=> <Chip key={index} style={{ alignSelf: "flex-start", backgroundColor: colors[tags[tag]] }} textStyle={{ color: "#000" }}>{tag}</Chip>) }
+
             </View>
+
             </>
           </TouchableRipple>
         }>
+
           <Menu.Item onPress={() => { deleteT(rowData.id); menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); }} leadingIcon="close" title="Delete" />
           <Menu.Item onPress={() => { setTaskToEdit(rowData); taskToEdit = rowData; menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); editSheetModalRef.current?.present(); }} leadingIcon="square-edit-outline" title="Edit" />
+
         </Menu>
       );
     }
 
     return(
       <Menu visible={menusVisible[rowData.index]} onDismiss={() => { menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); }} anchor={
+
         <TouchableRipple style={{flex:1, marginTop: sectionID == 0 ? 1 : -11}} onLongPress={() => { menusVisible[rowData.index] = true; setMenusVisible([...menusVisible]); }}>
           <>
+
             <View style={{ display: "flex", flexDirection: "row" }}>
+
               <Text style={{ fontWeight: 'bold', color: theme.grey1, marginRight: 3}}>{rowData.time}</Text>
+
               <View style={{ marginTop: sectionID == 0 ? 0 : -2, height: 25, borderRadius: 8, backgroundColor: chipBgColor, paddingHorizontal: 6, paddingVertical: 0, minWidth: 25, display: "flex", justifyContent: "center" }}>
+
                 {
                   "event" in rowData ?
                     <Text variant="labelMedium" style={{ fontWeight: "bold", color: "#000" }}>EVENT</Text> :
                     <Icon size={22} source={rowData.priority == "1" ? "roman-numeral-1" : rowData.priority == "2" ? "roman-numeral-2" : rowData.priority == "3" ? "roman-numeral-3" : "roman-numeral-4"} color="#000"></Icon>
                 }
+
               </View>
+
             </View>
+
             <Text style={{ fontWeight: 'bold' }} variant="titleLarge">{rowData.title}</Text>
             <Text variant="titleMedium">{rowData.description}</Text>
+
             { rowData.tags.map((tag, index) => <Chip key={index} style={{ alignSelf: "flex-start", backgroundColor: colors[tags[tag]] }} textStyle={{ color: "#000" }}>{tag}</Chip>) }
+
           </>
         </TouchableRipple>
       }>
+
         <Menu.Item onPress={() => { deleteT(rowData.id); menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); }} leadingIcon="close" title="Delete" />
         <Menu.Item onPress={() => { setTaskToEdit(rowData); taskToEdit = rowData; console.log(taskToEdit); menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); editSheetModalRef.current?.present(); }} leadingIcon="square-edit-outline" title="Edit" />
+
       </Menu>
     );
   }
@@ -237,8 +274,11 @@ const TimelineComponent = ({ route }) => {
   return (
     <>
 
+
+      {/* FILTER PANEL */}
       <View style={{ display: "flex", flexDirection: "row", marginBottom: 9, marginTop: 2 }}>
         <ScrollView horizontal>
+
           {
             Object.keys(tags).filter(key => key != "EVENT" && key != "REMINDER").map((key, index) => {
               return(
@@ -246,12 +286,14 @@ const TimelineComponent = ({ route }) => {
               );
             })
           }
+
         </ScrollView>
       </View>
 
 
       <ScrollView>
 
+      {/* OVERDUE TASKS */}
       {
         overdue.map((dailyTasks, index) => {
           return(
@@ -270,9 +312,11 @@ const TimelineComponent = ({ route }) => {
         })
       }
 
+      {/* TODAY DIVIDOR */}
       <Text style={{ fontWeight: 'bold', textAlign: "center", marginTop: 5 }} variant="displayMedium">Today</Text>
       <Text style={{ textAlign: "center", marginBottom: 10 }} variant="titleSmall">{new Date().toLocaleDateString('en-US', {weekday: 'short', day: 'numeric', month: 'short'})}</Text>
 
+      {/* TODAY TASKS TIMELINE */}
       <Timeline
         key={`${darkMode}`}
         style={{ marginBottom: 15 }}
@@ -284,6 +328,7 @@ const TimelineComponent = ({ route }) => {
         renderCircle={ (rowData, sectionID, rowID) => { return renderCircle(rowData, sectionID, rowID, darkMode); }}
         options={{ extraData: darkMode, refreshing: true }} />
 
+      {/* FUTURE TASKS */}
       {
         future.map((dailyTasks, index) => {
           if ("dateChange" in dailyTasks[0]) {
@@ -311,11 +356,19 @@ const TimelineComponent = ({ route }) => {
       }
 
       </ScrollView>
+
+
+      {/* ADD TASK BUTTON */}
       <FAB onPress={() => { addNewTask(); } } icon="plus" style={styles.fab} />
+
+
+      {/* SNACKBARS */}
       <Snackbar visible={addVisible}>Added new task!</Snackbar>
       <Snackbar visible={completeVisible}>Completed task!</Snackbar>
       <Snackbar visible={deleteVisible}>Deleted task!</Snackbar>
 
+
+      {/* ADD TASK CARD PLACEHOLDER */}
       <BottomSheetModal
           ref={bottomSheetModalRef}
           index={0}
@@ -327,6 +380,8 @@ const TimelineComponent = ({ route }) => {
         </BottomSheetView>
       </BottomSheetModal>
 
+
+      {/* EDIT TASK CARD PLACEHOLDER */}
       <BottomSheetModal
           ref={editSheetModalRef}
           index={0}
@@ -337,6 +392,7 @@ const TimelineComponent = ({ route }) => {
           <EditPanel sheetRef={editSheetModalRef} reload={route.params.reloadTasks} reloadTags={route.params.reloadTags} task={taskToEdit}/>
         </BottomSheetView>
       </BottomSheetModal>
+
 
     </>
   );

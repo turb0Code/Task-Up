@@ -3,16 +3,8 @@ import * as FileSystem from 'expo-file-system';
 import * as Network from 'expo-network';
 import * as Notifications from 'expo-notifications';
 
+// RETURNS CONNECTION OBJECT TO API
 export const getApi = async () => {
-
-    // await Notifications.scheduleNotificationAsync({
-    //     content: {
-    //       title: "My test notification",
-    //       body: 'Here is the notification body',
-    //     },
-    //     trigger: { seconds: 10 },
-    // });
-
     const tokenFileUri = FileSystem.documentDirectory + "token.json";
     const fileContents = await FileSystem.readAsStringAsync(tokenFileUri, { encoding: FileSystem.EncodingType.UTF8 })
     const jsonData = JSON.parse(fileContents);
@@ -20,37 +12,37 @@ export const getApi = async () => {
     return api;
 }
 
+
+// RETURNS ALL TASKS FROM API
 export const getAllTasks = async (api) => {
 
+    const tasksFileUri = FileSystem.documentDirectory + "tasks.json";
     let connected = (await Network.getNetworkStateAsync()).isConnected;
 
     let allTasks = [];
 
     if (connected) {
-        console.log("ONLINE");
         await api.getTasks()
             .then((tasks) => { allTasks = tasks; })
             .catch((error) => console.log(error))
     }
     else {
-        console.log("FROM FILE!");
-        const tasksFileUri = FileSystem.documentDirectory + "tasks.json";
         const fileContents = await FileSystem.readAsStringAsync(tasksFileUri, { encoding: FileSystem.EncodingType.UTF8 })
         const jsonData = JSON.parse(fileContents);
         allTasks = jsonData;
     }
 
-
-    const tasksFileUri = FileSystem.documentDirectory + "tasks.json";
     await FileSystem.writeAsStringAsync(tasksFileUri, JSON.stringify(allTasks), { encoding: FileSystem.EncodingType.UTF8 });
 
     let index = 0;
     for (let i = 0; i < allTasks.length; i++) {
         if (allTasks[i].labels.includes("REMINDER")) {
+
             allTasks[i].labels = allTasks[i].labels.filter(label => label != "REMINDER");
             let endIndex =  allTasks[i].description.indexOf("!", 2);
             let reminders = allTasks[i].description.substring(1, endIndex).split("*");
             allTasks[i].description = allTasks[i].description.substring(endIndex+1+1);
+
             const remindersFileUri = FileSystem.documentDirectory + "reminders.json";
             const fileInfo = await FileSystem.getInfoAsync(remindersFileUri);
             let jsonData = { ids: [] }
@@ -58,8 +50,8 @@ export const getAllTasks = async (api) => {
                 const fileContents = await FileSystem.readAsStringAsync(remindersFileUri, { encoding: FileSystem.EncodingType.UTF8 })
                 jsonData = JSON.parse(fileContents);
             }
-            if (!(jsonData.ids.includes(allTasks[i].id))) {
-                console.log("REMINDER");
+
+            if (!jsonData.ids.includes(allTasks[i].id)) {
                 await Notifications.scheduleNotificationAsync({
                     content: {
                         title: `${allTasks[i].content}`,

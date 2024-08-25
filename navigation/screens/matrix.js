@@ -13,28 +13,40 @@ import TasksContext from '../Tasks.js';
 
 const Matrix = ({ route }) => {
 
+  // THEME
   let theme  = useTheme();
 
+  // API
   let api = {};
   getApi().then(a => {
     api = a;
   });
 
-  let [matrixTasks, setMatrixTasks] = useState({uI: 0, nuI: 0, uUI: 0, nuUI: 0});
+  // FILTERS
   const [filter, setFilter] = useState("");
-  const [completeVisible, setCompleteVisible] = useState(false);
+
+  // ADD TASK CARD
   const snapPoints = React.useMemo(() => ['57%'], []);
   const bottomSheetModalRef = React.useRef(null);
-  const editSheetModalRef = React.useRef(null);
-  let [addTaskDate, setAddTaskDate] = useState(new Date());
   const [addTask, setAddTask] = useState(false);
+  let [addTaskDate, setAddTaskDate] = useState(new Date());
+
+  // EDIT TASK CARD
+  const editSheetModalRef = React.useRef(null);
   let [taskToEdit, setTaskToEdit] = useState({});
 
+  // COMPLETE TASK
+  const [completeVisible, setCompleteVisible] = useState(false);
+
+  // TASKS
+  let [matrixTasks, setMatrixTasks] = useState({uI: 0, nuI: 0, uUI: 0, nuUI: 0});
   let { tasks } = React.useContext(TasksContext);
+
+  // TAGS
   let apiTags = React.useContext(TagsContext);
   let tags = apiTags;
 
-
+  // RELOAD WHEN ROUTE CHANGES
   React.useEffect(() => {
     if (filter !== "") {
       tasks = tasks.filter(t => { if (t.labels.includes(filter)) { return t; } else { return null; } } );
@@ -49,6 +61,7 @@ const Matrix = ({ route }) => {
 
   }, [route]);
 
+  // RELOAD VIEW ON FILTER PICK OR WHEN TASKS CHANGE
   React.useEffect(() => {
     if (filter !== "") {
       tasks = tasks.filter(t => { if (t.labels.includes(filter)) { return t; } else { return null; } } );
@@ -63,7 +76,7 @@ const Matrix = ({ route }) => {
 
   }, [filter, tasks]);
 
-
+  // function to mark task on server as completed
   const complete = (id) => {
     setCompleteVisible(true);
     completeTask(api, id);
@@ -75,19 +88,22 @@ const Matrix = ({ route }) => {
     }, 3000);
   }
 
+  // function to show card for adding task
   const addNewTask = () => {
     bottomSheetModalRef.current?.present();
     setAddTask(true);
   }
 
+  // function to render tasks on each list
   const renderTasks = (tasks, color) => {
 
+    // task menu visibility
     let [visibility, setVisibility] = React.useState([]);
 
     if (tasks.length > 0) {
 
       if (!visibility.includes(true)) {
-        visibility = new Array(tasks.length).fill(false);
+        visibility = new Array(tasks.length).fill(false);  // 
       }
 
       return (
@@ -95,7 +111,9 @@ const Matrix = ({ route }) => {
           {
             tasks.map((task, index) => { return(
               <Menu visible={visibility[index]} onDismiss={() => { setVisibility(visibility.map(s => false)); }} anchor={
+
                 <TouchableRipple onLongPress={() => { setVisibility(visibility.map((s, i) => i == index ? true : false)); }} key={index} style={{ display: "flex", flexDirection: "row", display: "flex", alignItems: "center", marginLeft: 9, marginBottom: 2 }}>
+
                   <>
                     <TouchableRipple onPress={() => { complete(task.id) }} style={[styles.circle, { borderColor: color, alignSelf: "flex-start", marginTop: 4 }]}><></></TouchableRipple>
                     <View style={{ display: "flex", flexDirection: "column" }}>
@@ -103,10 +121,14 @@ const Matrix = ({ route }) => {
                       <Text variant="labelMedium" style={{ marginLeft: 5, marginTop: -2 }}>{task.time}</Text>
                     </View>
                   </>
+
                 </TouchableRipple>
+
               }>
+
                 <Menu.Item onPress={() => { deleteT(rowData.id); setVisibility(visibility.map(s => false)); }} leadingIcon="close" title="Delete" />
                 <Menu.Item onPress={() => { taskToEdit = task; editSheetModalRef.current?.present(); setVisibility(visibility.map(s => false)); }} leadingIcon="square-edit-outline" title="Edit"/>
+
               </Menu>
             );})
           }
@@ -119,10 +141,15 @@ const Matrix = ({ route }) => {
 
   }
 
+
   return (
     <>
+
+
+      {/* FILTER PANEL */}
       <View style={{ display: "flex", flexDirection: "row", marginBottom: 10, marginTop: 2 }}>
         <ScrollView horizontal>
+
           {
             Object.keys(tags).filter(key => key != "EVENT" && key != "REMINDER").map((key, index) => {
               return(
@@ -130,13 +157,18 @@ const Matrix = ({ route }) => {
               );
             })
           }
+
         </ScrollView>
       </View>
 
+
+      {/* PLACE FOR WHOLE MATRIX */}
       <View style={{ display: "flex", flexDirection: "column", justifyContent: "space-around", height: "90%" }}>
 
+        {/* FIRST ROW OF FIELDS */}
         <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-around", height: "48.2%", width: "100%"}}>
 
+          {/* URGENT & IMPORTANT */}
           <Surface style={[styles.box]} elevation={1}>
             <View style={{ display: "flex", flexDirection: "row", marginLeft: 5, marginTop: 5, marginBottom: 2 }}>
               <View style={{ width: 22, height: 22, backgroundColor: colors.priority_4_background, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center"}}><Icon size={20} source="roman-numeral-4" color="#000"></Icon></View>
@@ -145,6 +177,7 @@ const Matrix = ({ route }) => {
             { matrixTasks["uI"] == 0 || matrixTasks["uI"] === undefined ? renderTasks([], colors.priority_4) : renderTasks(matrixTasks["uI"], colors.priority_4) }
           </Surface>
 
+          {/* NOT URGENT & IMPORTANT */}
           <Surface style={[styles.box]} elevation={1}>
             <View style={{ display: "flex", flexDirection: "row", marginLeft: 5, marginTop: 5, marginBottom: 2 }}>
               <View style={{ width: 22, height: 22, backgroundColor: colors.priority_3_background, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center"}}><Icon size={20} source="roman-numeral-3" color="#000"></Icon></View>
@@ -155,8 +188,10 @@ const Matrix = ({ route }) => {
 
         </View>
 
+        {/* SECOND ROW OF FIELDS */}
         <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-around", height: "48.2%", width: "100%"}}>
 
+          {/* URGENT & UNIMPORTANT */}
           <Surface style={[styles.box]} elevation={1}>
             <View style={{ display: "flex", flexDirection: "row", marginLeft: 5, marginTop: 5, marginBottom: 2 }}>
               <View style={{ width: 22, height: 22, backgroundColor: colors.priority_2_background, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center"}}><Icon size={20} source="roman-numeral-2" color="#000"></Icon></View>
@@ -165,6 +200,7 @@ const Matrix = ({ route }) => {
             { matrixTasks["uUI"] == 0 || matrixTasks["uUI"] === undefined ? renderTasks([], colors.priority_2) : renderTasks(matrixTasks["uUI"], colors.priority_2) }
           </Surface>
 
+          {/* NOT URGENT & UNIMPORTANT */}
           <Surface style={[styles.box]} elevation={1}>
             <View style={{ display: "flex", flexDirection: "row", marginLeft: 3, marginTop: 5, marginBottom: 2 }}>
               <View style={{ width: 22, height: 22, backgroundColor: colors.priority_1_background, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center"}}><Icon size={20} source="roman-numeral-1" color="#000"></Icon></View>
@@ -177,10 +213,16 @@ const Matrix = ({ route }) => {
 
       </View>
 
+
+      {/* BUTTON TO ADD NEW TASK */}
       <FAB onPress={() => addNewTask() } icon="plus" style={styles.fab} />
 
+
+      {/* SNACKBARS */}
       <Snackbar visible={completeVisible}>Completed task!</Snackbar>
 
+
+      {/* CARD WITH MENU FOR ADDING NEW TASK */}
       <BottomSheetModal
           ref={bottomSheetModalRef}
           index={0}
@@ -192,6 +234,8 @@ const Matrix = ({ route }) => {
         </BottomSheetView>
       </BottomSheetModal>
 
+
+      {/* CARD WITH MENU TO EDIT TASK */}
       <BottomSheetModal
           ref={editSheetModalRef}
           index={0}
@@ -202,6 +246,7 @@ const Matrix = ({ route }) => {
           <EditPanel sheetRef={editSheetModalRef} reload={route.params.reloadTasks} reloadTags={route.params.reloadTags} task={taskToEdit}/>
         </BottomSheetView>
       </BottomSheetModal>
+
 
     </>
   );
