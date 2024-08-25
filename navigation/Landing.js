@@ -49,13 +49,15 @@ const Landing = ({ handleBackToMain }) => {
 //       .catch((error) => console.error(error))
 //   }
 
+  // THEME
   let { darkMode, setDarkMode } = React.useContext(DarkMode);
-
-
-  const [token, setToken] = React.useState("");
-
   let theme = useTheme();
 
+
+  // TOKEN SAVING
+  const [token, setToken] = React.useState("");
+
+  // function to save token in local storage
   const saveToken = async () => {
     const fileUri = FileSystem.documentDirectory + "token.json";
     const tokenFile = JSON.stringify({ token: token });
@@ -73,14 +75,18 @@ const Landing = ({ handleBackToMain }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+
       <View style={{ height: 760, width: 340, alignItems: 'center', justifyContent: 'center', borderRadius: 19, position: "absolute", top: "50%", left: "50%", transform: [{ translateX: -170 }, { translateY: -380}] }}>
         <View style={{ height: "100%", width: "100%", alignItems: 'center', justifyContent: 'center', backgroundColor: theme.colors.elevation.level2, borderRadius: 15, shadowColor: "#000000", shadowOffset: 10, shadowOpacity: 1, shadowRadius: 8, marginTop: 25 }}>
+
           <IconButton icon={darkMode ? "brightness-7" : "moon-waning-crescent"} size={30} style={{ position: "absolute", right: 0, top: 0, padding: 0 }} onPress={() => setDarkMode(!darkMode)} />
           <Text variant="displayLarge" style={{ fontSize: 65, marginTop: -20 }}>Task Up!</Text>
           <TextInput mode="outlined" vaule={token} onChangeText={text => setToken(text)} label="Token" style={{ width: "80%", marginTop: 55, height: 60 }} outlineStyle={{ borderRadius: 10 }}></TextInput>
           <Button onPress={() => saveToken(token)} mode="contained" style={{ width: "80%", height: 45, marginTop: 10, alignItems: 'center', justifyContent: 'center', borderRadius: 22.5 }}>Login</Button>
+
         </View>
       </View>
+
     </View>
   );
 };

@@ -9,17 +9,19 @@ import TagsContext from "./Tags.js";
 import TasksContext from "./Tasks.js";
 import Calendar from './screens/calendar.js';
 import Matrix from './screens/matrix.js';
-import * as Network from 'expo-network';
 import Settings from './screens/settings.js';
 import TimelineComponent from "./screens/timeline.js";
 
 function MainView({ handleBackToLanding }) {
 
-  let [tasks, setTasks] = React.useState([]);
-  let [tags, setTags] = React.useState([]);
+  // THEME
   let theme = useTheme();
 
+  // TASKS AND TAGS
+  let [tasks, setTasks] = React.useState([]);
+  let [tags, setTags] = React.useState([]);
 
+  // first load tasks and tags
   React.useEffect(() => {
     console.log('This will run only once when the component mounts');
 
@@ -35,22 +37,23 @@ function MainView({ handleBackToLanding }) {
 
     getApi().then(api => {
       getTasks(api)
-        .then((t) => { console.log("AA"); setTasks(t); });
+        .then((t) => { setTasks(t); });
 
       getTags(api)
-        .then((t) => { console.log("BB"); setTags(t); })
+        .then((t) => { setTags(t); })
         .catch((err) => { console.log(err) });
 
       setInterval(() => {
         getTasks(api)
-          .then((t) => { console.log("AA"); setTasks(t); })
+          .then((t) => { setTasks(t); });
 
         getTags(api)
-          .then((t) => { console.log("BB"); setTags(t); })
+          .then((t) => { setTags(t); });
       }, 120000)
     });
   }, []);
 
+  // function to reload tasks and tags
   const reloadTasks = () => {
     console.log("Reloading tasks...");
 
@@ -66,13 +69,14 @@ function MainView({ handleBackToLanding }) {
 
     getApi().then(api => {
       getTasks(api)
-        .then((t) => { console.log("AA"); setTasks(t); })
+        .then((t) => { setTasks(t); });
 
       getTags(api)
-        .then((t) => { console.log("BB"); setTags(t); });
+        .then((t) => { setTags(t); });
     });
   }
 
+  // reload tags
   const reloadTags = () => {
     const getTags = async (api) => {
       let tmpTags = getAllTags(api);
@@ -84,14 +88,13 @@ function MainView({ handleBackToLanding }) {
     });
   }
 
-  console.log(tasks);
-  console.log(tags);
-
+  // routes names
   const timelineName = "Timeline";
   const calendarName = "Calendar";
   const matrixName = "Matrix";
   const settingsName = "Settings";
 
+  // navigator
   const Tab = createBottomTabNavigator();
 
   return (
@@ -146,6 +149,7 @@ function MainView({ handleBackToLanding }) {
             })}
           >
 
+            {/* ROUTES */}
             <Tab.Screen options={{ headerTitle: 'Task Up!' }} name={timelineName} component={TimelineComponent} initialParams={{ tasks: tasks, reloadTasks: reloadTasks, reloadTags: reloadTags }} />
             <Tab.Screen name={calendarName} component={Calendar} initialParams={{ tasks: tasks, reloadTasks: reloadTasks, reloadTags: reloadTags }} />
             <Tab.Screen options={{ headerTitle: 'Eisenhower Matrix' }} name={matrixName} component={Matrix} initialParams={{ tasks: tasks, reloadTasks: reloadTasks, reloadTags: reloadTags }} />
