@@ -4,7 +4,7 @@ import * as Network from 'expo-network';
 // RETURNS TAGS FROM API
 export const getAllTags = async (api) => {
 
-    const tagsFileUri = FileSystem.documentDirectory + "tags.json";ddddddddd
+    const tagsFileUri = FileSystem.documentDirectory + "tags.json";
 
     let connected = (await Network.getNetworkStateAsync()).isConnected;
 

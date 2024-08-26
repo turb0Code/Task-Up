@@ -6,12 +6,13 @@ import { Chip, FAB, Icon, Menu, Text, TouchableRipple, useTheme } from 'react-na
 import Timeline from 'react-native-timeline-flatlist';
 import { deleteTask } from '../../api/delete.js';
 import { timelineArrange } from "../../api/timeline.js";
+import AddPanel from "../../components/add.js";
 import { colors } from "../../components/colors.js";
 import DarkMode from "../DarkMode.js";
 import TagsContext from "../Tags.js";
 import TasksContext from '../Tasks.js';
 
-const Calendar = () => {
+const Calendar = ({ route }) => {
 
   // THEME
   let { darkMode, setDarkMode } = React.useContext(DarkMode);
@@ -37,11 +38,16 @@ const Calendar = () => {
 
   const marked = React.useMemo(() => {
     let result = {};
-    tasks.forEach(t => {
-      t.forEach(day => {
-        let date = new Date(day[0].normalDate)
-        result[date.toISOString().substring(0, 10)] = { marked: true }
-      });
+    tasks.forEach((t, index) => {
+      if (index == 1 && t.length > 0) {
+        result[t[0].date] = { marked: true };
+      }
+      else {
+        t.forEach(day => {
+          let date = new Date(day[0].normalDate);
+          result[date.toISOString().substring(0, 10)] = { marked: true };
+        });
+      }
     });
 
     return {
@@ -55,6 +61,7 @@ const Calendar = () => {
 
   //ADD TASK MODAL
   const [addTask, setAddTask] = React.useState(false);
+  let [addTaskDate, setAddTaskDate] = React.useState(new Date());
   const snapPoints = React.useMemo(() => ['57%'], []);
   const bottomSheetModalRef = React.useRef(null);
 
@@ -87,6 +94,11 @@ const Calendar = () => {
 
     if (dates.includes(date)) {
       setPresentedTasks(<Text variant="titleLarge">Found tasks</Text>);
+
+      if (tasks[1][0].date == date) {
+        setPresentedTasks(tasks[1]);
+        return;
+      }
 
       tasks[0].forEach(day => {
         let dayDate = new Date(day[0].normalDate);
@@ -156,16 +168,18 @@ const Calendar = () => {
 
           <TouchableRipple style={{flex:1, marginTop: 0}} onLongPress={() => { menusVisible[rowData.index] = true; setMenusVisible([...menusVisible]); }}>
             <>
-            <View style={{flex:1, marginTop:-11}}>
+            <View style={{ flex:1, marginTop:-11 }}>
 
               <View style={{ display: "flex", flexDirection: "row" }}>
                 <Text style={{ fontWeight: 'bold', color: theme.grey1, marginRight: 3}}>{rowData.time}</Text>
                 <View style={{ marginTop: -2, height: 25, borderRadius: 8, backgroundColor: chipBgColor, paddingHorizontal: 6, paddingVertical: 0, minWidth: 25, display: "flex", justifyContent: "center" }}>
+
                   {
                     "event" in rowData ?
                       <Text variant="labelMedium" style={{ fontWeight: "bold", color: "#000" }}>EVENT</Text> :
                       <Icon size={22} source={rowData.priority == "1" ? "roman-numeral-1" : rowData.priority == "2" ? "roman-numeral-2" : rowData.priority == "3" ? "roman-numeral-3" : "roman-numeral-4"} color="#000"></Icon>
                   }
+
                 </View>
               </View>
 
@@ -193,11 +207,13 @@ const Calendar = () => {
 
               <Text style={{ fontWeight: 'bold', color: theme.grey1, marginRight: 3}}>{rowData.time}</Text>
               <View style={{ marginTop: -2, height: 25, borderRadius: 8, backgroundColor: chipBgColor, paddingHorizontal: 6, paddingVertical: 0, minWidth: 25, display: "flex", justifyContent: "center" }}>
+
                 {
                   "event" in rowData ?
                     <Text variant="labelMedium" style={{ fontWeight: "bold", color: "#000" }}>EVENT</Text> :
                     <Icon size={22} source={rowData.priority == "1" ? "roman-numeral-1" : rowData.priority == "2" ? "roman-numeral-2" : rowData.priority == "3" ? "roman-numeral-3" : "roman-numeral-4"} color="#000"></Icon>
                 }
+
               </View>
 
             </View>
@@ -212,7 +228,7 @@ const Calendar = () => {
       }>
 
         <Menu.Item onPress={() => { deleteT(rowData.id); menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); }} leadingIcon="close" title="Delete" />
-        <Menu.Item onPress={() => { setTaskToEdit(rowData); taskToEdit = rowData; console.log(taskToEdit); menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); editSheetModalRef.current?.present(); }} leadingIcon="square-edit-outline" title="Edit" />
+        <Menu.Item onPress={() => { setTaskToEdit(rowData); taskToEdit = rowData; menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); editSheetModalRef.current?.present(); }} leadingIcon="square-edit-outline" title="Edit" />
 
       </Menu>
     );
@@ -236,7 +252,7 @@ const Calendar = () => {
 
 
       {/* CALENDER VIEW */}
-      <CalendarComponent key={theme.colors.primary} markingType='dot' markedDates={marked} onDayPress={day => { console.log('selected day', day); setSelected(day.dateString); displayTasks(day.dateString); }} enableSwipeMonths={true} theme={{calendarBackground: theme.colors.background, selectedDayBackgroundColor: theme.colors.primaryContainer, monthTextColor: theme.colors.onBackground, arrowColor: theme.colors.onBackground, textDisabledColor: "#999999", dayTextColor: theme.colors.onBackground}}></CalendarComponent>
+      <CalendarComponent key={theme.colors.primary} markingType='dot' markedDates={marked} onDayPress={day => { setSelected(day.dateString); displayTasks(day.dateString); }} enableSwipeMonths={true} theme={{calendarBackground: theme.colors.background, selectedDayBackgroundColor: theme.colors.primaryContainer, monthTextColor: theme.colors.onBackground, arrowColor: theme.colors.onBackground, textDisabledColor: "#999999", dayTextColor: theme.colors.onBackground}}></CalendarComponent>
 
 
       {/* LIST OF TASKS FOR PICKED DAY */}

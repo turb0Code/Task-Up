@@ -49,7 +49,7 @@ export const timelineArrange = (tasks) => {
 
   tasksLists[0] = tasksLists[0].map(overdue => {
     let tasks = transfromTasks(overdue, idx);
-    idx = tasks[tasks.length - 1][1][tasks[tasks.length - 1][1].length - 1];
+    idx = tasks[tasks.length - 1].index;
     return tasks;
   });
 
