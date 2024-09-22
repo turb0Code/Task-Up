@@ -157,9 +157,10 @@ const AddPanel = ({ sheetRef, reload, reloadTags, defaultDate }) => {
   }
 
   const changeReminder = (days, hour, index, custom) => {
+
     let reminder = {
       daysBefore: days,
-      hour: `${hour.getHours}:${hour.getMinutes}`
+      hour: `${hour.getHours()}:${hour.getMinutes()}`
     };
 
     if (!pickedReminders[index]) {
@@ -338,7 +339,7 @@ const AddPanel = ({ sheetRef, reload, reloadTags, defaultDate }) => {
             options.map((option, index) => {
               return(
                 <View style={{ display: "flex", flexDirection: "row", alignItems: 'center' }}>
-                  <Checkbox status={pickedReminders[index]? 'checked' : 'unchecked'} onPress={() => { closeAlertMenu(); handleCheckBox(index); changeReminder(option.daysBefore, time.getTime()-60*60*1000*option.hoursBefore, index, option.custom); setReminderRender(option.title); }} title={option.label} />
+                  <Checkbox status={pickedReminders[index]? 'checked' : 'unchecked'} onPress={() => { closeAlertMenu(); handleCheckBox(index); changeReminder(option.daysBefore, new Date(time.getTime()-60*60*1000*option.hoursBefore), index, option.custom); setReminderRender(option.title); }} title={option.label} />
                   <Text>{option.label}</Text>
                 </View>
               );
