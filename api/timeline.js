@@ -1,11 +1,15 @@
+// RETURNS OBJECT WITH TASKS PREPARED TO DISPLAY ON TIMELINE
 export const timelineArrange = (tasks) => {
+  // arranged by date
   const overDueTasksByDate = {};
   const futureTasksByDate = {};
 
+  // arrays for three main groups
   const overdueTasks = [];
   const todayTasks = [];
   const futureTasks = [];
 
+  // divide tasks into three main groups
   tasks.forEach(task => {
     const today = new Date();
     const dueDate = new Date(task.due.date);
@@ -21,12 +25,11 @@ export const timelineArrange = (tasks) => {
     }
   });
 
+  // fill days without tasks with empty arrays
   overdueTasks.forEach(task => {
     const dueDate = task.due.date;
 
-    if (!overDueTasksByDate[dueDate]) {
-      overDueTasksByDate[dueDate] = [];
-    }
+    if (!overDueTasksByDate[dueDate]) { overDueTasksByDate[dueDate] = []; }
 
     overDueTasksByDate[dueDate].push(task);
   });
@@ -34,84 +37,20 @@ export const timelineArrange = (tasks) => {
   futureTasks.forEach(task => {
     const dueDate = task.due.date;
 
-    if (!futureTasksByDate[dueDate]) {
-      futureTasksByDate[dueDate] = [];
-    }
+    if (!futureTasksByDate[dueDate]) { futureTasksByDate[dueDate] = []; }
 
     futureTasksByDate[dueDate].push(task);
   });
 
+  // grouped tasklist
   let tasksLists = [Object.values(overDueTasksByDate), todayTasks, Object.values(futureTasksByDate)];
 
   let idx = -1;
 
-  tasksLists[0] = tasksLists[0].map(tasks => {
-    return tasks.flatMap((task, index) => {
-      idx++;
-      if (index == 0) {
-        let date = new Date(task.due.date);
-        if (task.labels.includes("EVENT")) {
-          return [ {
-            dateChange: true,
-            date: date.toLocaleDateString('en-US', {weekday: 'short', day: 'numeric', month: 'short'}),
-            overdue: true,
-            normalDate: date
-          }, {
-            id: task.id,
-            index: idx,
-            date: task.due.date,
-            time: task.due.string,
-            title: task.content,
-            description: task.description,
-            tags: task.labels.filter(tag => tag != "EVENT"),
-            priority: task.priority,
-            overdue: true,
-            event: true
-          } ];
-        }
-        return [ {
-          dateChange: true,
-          date: date.toLocaleDateString('en-US', {weekday: 'short', day: 'numeric', month: 'short'}),
-          overdue: true,
-          normalDate: date
-        }, {
-          id: task.id,
-          index: idx,
-          date: task.due.date,
-          time: task.due.string,
-          title: task.content,
-          description: task.description,
-          tags: task.labels.filter(tag => tag != "EVENT"),
-          priority: task.priority,
-          overdue: true,
-        } ];
-      }
-      if (task.labels.includes("EVENT")) {
-          return [ {
-            id: task.id,
-            index: idx,
-            date: task.due.date,
-            time: task.due.string,
-            title: task.content,
-            description: task.description,
-            tags: task.labels.filter(tag => tag != "EVENT"),
-            priority: task.priority,
-            overdue: true,
-            event: true
-          } ];
-        }
-        return [ {
-          id: task.id,
-          index: idx,
-          date: task.due.date,
-          time: task.due.string,
-          title: task.content,
-          description: task.description,
-          tags: task.labels,
-          priority: task.priority,
-          overdue: true
-        } ];
-    });
+  tasksLists[0] = tasksLists[0].map(overdue => {
+    let tasks = transfromTasks(overdue, idx, true);
+    idx = tasks[tasks.length - 1].index;
+    return tasks;
   });
 
   tasksLists[1] = tasksLists[1].flatMap((task, index) => {
@@ -126,7 +65,8 @@ export const timelineArrange = (tasks) => {
         description: task.description,
         tags: task.labels.filter(tag => tag != "EVENT"),
         priority: task.priority,
-        event: true
+        event: true,
+        today: true
       } ];
     }
     return [ {
@@ -137,35 +77,26 @@ export const timelineArrange = (tasks) => {
       title: task.content,
       description: task.description,
       tags: task.labels,
-      priority: task.priority
+      priority: task.priority,
+      today: true
     } ];
   });
 
-  tasksLists[2] = tasksLists[2].map(tasks => {
-    return tasks.flatMap((task, index) => {
-      idx++;
-      if (index == 0) {
-        let date = new Date(task.due.date);
-        if (task.labels.includes("EVENT")) {
-          return [ {
-            dateChange: true,
-            date: date.toLocaleDateString('en-US', {weekday: 'short', day: 'numeric', month: 'short'}),
-            normalDate: date
-          }, {
-            id: task.id,
-            index: idx,
-            date: task.due.date,
-            time: task.due.string,
-            title: task.content,
-            description: task.description,
-            tags: task.labels.filter(tag => tag != "EVENT"),
-            priority: task.priority,
-            event: true
-          } ];
-        }
+  tasksLists[2] = tasksLists[2].map(tasks => { return transfromTasks(tasks, idx, false); });
+
+  return tasksLists;
+}
+
+const transfromTasks = (tasks, idx, overdue) => {
+  return tasks.flatMap((task, index) => {
+    idx++;
+    if (index == 0) {
+      let date = new Date(task.due.date);
+      if (task.labels.includes("EVENT")) {
         return [ {
           dateChange: true,
           date: date.toLocaleDateString('en-US', {weekday: 'short', day: 'numeric', month: 'short'}),
+          overdue: overdue,
           normalDate: date
         }, {
           id: task.id,
@@ -175,34 +106,52 @@ export const timelineArrange = (tasks) => {
           title: task.content,
           description: task.description,
           tags: task.labels.filter(tag => tag != "EVENT"),
-          priority: task.priority
-        } ]
+          priority: task.priority,
+          overdue: overdue,
+          event: true
+        } ];
       }
-      if (task.labels.includes("EVENT")) {
-          return {
-            id: task.id,
-            index: idx,
-            date: task.due.date,
-            time: task.due.string,
-            title: task.content,
-            description: task.description,
-            tags: task.labels.filter(tag => tag != "EVENT"),
-            priority: task.priority,
-            event: true
-          };
-        }
-        return {
+      return [ {
+        dateChange: true,
+        date: date.toLocaleDateString('en-US', {weekday: 'short', day: 'numeric', month: 'short'}),
+        overdue: overdue,
+        normalDate: date
+      }, {
+        id: task.id,
+        index: idx,
+        date: task.due.date,
+        time: task.due.string,
+        title: task.content,
+        description: task.description,
+        tags: task.labels.filter(tag => tag != "EVENT"),
+        priority: task.priority,
+        overdue: overdue,
+      } ];
+    }
+    if (task.labels.includes("EVENT")) {
+        return [ {
           id: task.id,
           index: idx,
           date: task.due.date,
           time: task.due.string,
           title: task.content,
           description: task.description,
-          tags: task.labels,
-          priority: task.priority
-        };
-    });
+          tags: task.labels.filter(tag => tag != "EVENT"),
+          priority: task.priority,
+          overdue: overdue,
+          event: true
+        } ];
+      }
+      return [ {
+        id: task.id,
+        index: idx,
+        date: task.due.date,
+        time: task.due.string,
+        title: task.content,
+        description: task.description,
+        tags: task.labels,
+        priority: task.priority,
+        overdue: overdue
+      } ];
   });
-
-  return tasksLists;
 }
