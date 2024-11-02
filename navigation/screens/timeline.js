@@ -26,6 +26,10 @@ const TimelineComponent = ({ route }) => {
     api = a;
   });
 
+  // TAGS
+  let apiTags = React.useContext(TagsContext);
+  let tags = apiTags;
+
   // REFRESH CONTROL
   const [refreshing, setRefreshing] = useState(false);
 
@@ -40,10 +44,6 @@ const TimelineComponent = ({ route }) => {
   // TODAY DATE
   let todayDate = new Date();
   todayDate.setHours(0, 0, 0, 0);
-
-  // TAGS
-  let apiTags = React.useContext(TagsContext);
-  let tags = apiTags;
 
   // TASKS AND FILTERS
   let {tasks, setTasks} = React.useContext(TasksContext);
@@ -262,7 +262,7 @@ const TimelineComponent = ({ route }) => {
     return(
       <Menu visible={menusVisible[rowData.index]} onDismiss={() => { menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); }} anchor={
 
-        <TouchableRipple style={{flex:1, marginTop: sectionID == 0 ? 1 : -11}} onLongPress={() => { menusVisible[rowData.index] = true; setMenusVisible([...menusVisible]); }}>
+        <TouchableRipple style={{flex:1, marginTop: sectionID == 0 ? -10 : -10}} onLongPress={() => { menusVisible[rowData.index] = true; setMenusVisible([...menusVisible]); }}>
           <>
 
             <View style={{ display: "flex", flexDirection: "row" }}>
@@ -284,7 +284,7 @@ const TimelineComponent = ({ route }) => {
             <Text style={{ fontWeight: 'bold' }} variant="titleLarge">{rowData.title}</Text>
             <Text variant="titleMedium">{rowData.description}</Text>
 
-            { rowData.tags.map((tag, index) => <Chip key={index} style={{ alignSelf: "flex-start", backgroundColor: colors[tags[tag]] }} textStyle={{ color: "#000" }}>{tag}</Chip>) }
+            { rowData.tags.map((tag, index) => <Chip key={index} style={{ backgroundColor: colors[tags[tag]], alignSelf: "flex-start" }} textStyle={{ color: "#000" }}>{tag}</Chip>) }
 
           </>
         </TouchableRipple>
@@ -317,78 +317,85 @@ const TimelineComponent = ({ route }) => {
       </View>
 
 
-      <ScrollView refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          colors={['grey']}
-          progressBackgroundColor={darkMode ? 'black' : 'white'}
-        />
-      }>
+      { overdue.length != 0 || today.length != 0 || future.length != 0 ?
+          <ScrollView refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={['grey']}
+              progressBackgroundColor={darkMode ? 'black' : 'white'}
+            />
+          }>
 
-      {/* OVERDUE TASKS */}
-      {
-        overdue.map((dailyTasks, index) => {
-          return(
-            <Timeline
-              style={{ marginBottom: 2 }}
-              key={`${index}-${darkMode}`}
-              innerCircle="dot"
-              lineColor="#a32424"
-              showTime={false}
-              data={dailyTasks}
-              theme={theme}
-              renderDetail={(rowData, sectionID, rowID) => { return renderTask(rowData, sectionID, rowID, darkMode); }}
-              renderCircle={(rowData, sectionID, rowID) => { return renderCircle(rowData, sectionID, rowID, darkMode); }}
-              options={{ extraData: darkMode, refreshing: true }} />
-          );
-        })
-      }
+          {/* OVERDUE TASKS */}
+          {
+            overdue.map((dailyTasks, index) => {
+              return(
+                <Timeline
+                  style={{ marginBottom: 2 }}
+                  key={`${index}-${darkMode}`}
+                  innerCircle="dot"
+                  lineColor="#a32424"
+                  showTime={false}
+                  data={dailyTasks}
+                  theme={theme}
+                  renderDetail={(rowData, sectionID, rowID) => { return renderTask(rowData, sectionID, rowID, darkMode); }}
+                  renderCircle={(rowData, sectionID, rowID) => { return renderCircle(rowData, sectionID, rowID, darkMode); }}
+                  options={{ extraData: darkMode, refreshing: true }} />
+              );
+            })
+          }
 
-      {/* TODAY DIVIDOR */}
-      <Text style={{ fontWeight: 'bold', textAlign: "center", marginTop: 5 }} variant="displayMedium">Today</Text>
-      <Text style={{ textAlign: "center", marginBottom: 10 }} variant="titleSmall">{new Date().toLocaleDateString('en-US', {weekday: 'short', day: 'numeric', month: 'short'})}</Text>
+          {/* TODAY DIVIDOR */}
+          <Text style={{ fontWeight: 'bold', textAlign: "center", marginTop: 5 }} variant="displayMedium">Today</Text>
+          <Text style={{ textAlign: "center", marginBottom: 10 }} variant="titleSmall">{new Date().toLocaleDateString('en-US', {weekday: 'short', day: 'numeric', month: 'short'})}</Text>
 
-      {/* TODAY TASKS TIMELINE */}
-      <Timeline
-        key={`${darkMode}`}
-        style={{ marginBottom: 15 }}
-        innerCircle="dot"
-        dotColor="#eeeeee"
-        showTime={false}
-        data={today}
-        renderDetail={(rowData, sectionID, rowID) => { return renderTask(rowData, sectionID, rowID, darkMode); }}
-        renderCircle={ (rowData, sectionID, rowID) => { return renderCircle(rowData, sectionID, rowID, darkMode); }}
-        options={{ extraData: darkMode, refreshing: true }} />
-
-      {/* FUTURE TASKS */}
-      {
-        future.map((dailyTasks, index) => {
-          if ("dateChange" in dailyTasks[0]) {
-            return(
-              <Timeline
-                style={{ marginTop: 15, marginBottom: 2 }}
-                key={`${index}-${darkMode}`}
+          {/* TODAY TASKS TIMELINE */}
+          {
+            tags != [] ?
+                <Timeline
+                key={`${darkMode}-${tags}`}
+                style={{ marginBottom: 15 }}
                 innerCircle="dot"
-                dotColor={theme.colors.background}
+                dotColor="#eeeeee"
                 showTime={false}
-                data={dailyTasks}
-                renderDetail={(rowData, sectionID, rowID) => { return renderTask(rowData, sectionID, rowID, darkMode); }}
-                renderCircle={(rowData, sectionID, rowID) => { return renderCircle(rowData, sectionID, rowID, darkMode); }} />
-            );
+                theme={theme}
+                data={today}
+                renderDetail={ (rowData, sectionID, rowID) => { return renderTask(rowData, sectionID, rowID, darkMode); }}
+                renderCircle={ (rowData, sectionID, rowID) => { return renderCircle(rowData, sectionID, rowID, darkMode); }} />
+              : <></>
           }
-          else {
-            return dailyTasks.map((task, i) => (
-              <View style={{ flexDirection: 'row' }}>
-                <TouchableRipple style={{ padding: "auto", display: "flex", alignItems: "center", justifyContent: "center", width: 20, height: 20, borderRadius: 20 / 2, backgroundColor: theme.colors.background, borderColor: "#bbbbbb", borderStyle: "solid", borderWidth: 2, left: 22 - 20 / 2 - (2 - 1) / 2, marginTop: 6 }} onPress={() => addNewTask()}><Icon size={14} source="plus-thick" color={"#999999"}></Icon></TouchableRipple>
-                <Text style={{ fontWeight: 700, marginLeft: 18, color: theme.additionalColors.grey1, marginTop: 2 }} key={i} variant="titleLarge"> {task.time}</Text>
-              </View>
-            ));
-          }
-        })
-      }
 
-      </ScrollView>
+          {/* FUTURE TASKS */}
+          {
+            future.map((dailyTasks, index) => {
+              if ("dateChange" in dailyTasks[0]) {
+                return(
+                  <Timeline
+                    style={{ marginTop: 15, marginBottom: 2 }}
+                    key={`${index}-${darkMode}`}
+                    innerCircle="dot"
+                    dotColor={theme.colors.background}
+                    showTime={false}
+                    data={dailyTasks}
+                    renderDetail={(rowData, sectionID, rowID) => { return renderTask(rowData, sectionID, rowID, darkMode); }}
+                    renderCircle={(rowData, sectionID, rowID) => { return renderCircle(rowData, sectionID, rowID, darkMode); }} />
+                );
+              }
+              else {
+                return dailyTasks.map((task, i) => (
+                  <View style={{ flexDirection: 'row' }}>
+                    <TouchableRipple style={{ padding: "auto", display: "flex", alignItems: "center", justifyContent: "center", width: 20, height: 20, borderRadius: 20 / 2, backgroundColor: theme.colors.background, borderColor: "#bbbbbb", borderStyle: "solid", borderWidth: 2, left: 22 - 20 / 2 - (2 - 1) / 2, marginTop: 6 }} onPress={() => addNewTask()}><Icon size={14} source="plus-thick" color={"#999999"}></Icon></TouchableRipple>
+                    <Text style={{ fontWeight: 700, marginLeft: 18, color: theme.additionalColors.grey1, marginTop: 2 }} key={i} variant="titleLarge"> {task.time}</Text>
+                  </View>
+                ));
+              }
+            })
+          }
+
+          </ScrollView>
+        : <Text style={{ fontWeight: 'bold', textAlign: "center", marginTop: 5 }} variant="displaySmall">Loading...</Text>
+      }
 
 
       {/* ADD TASK BUTTON */}

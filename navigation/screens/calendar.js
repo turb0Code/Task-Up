@@ -68,6 +68,9 @@ const Calendar = ({ route }) => {
   const editSheetModalRef = React.useRef(null);
 
   React.useEffect(() => {
+    setSelected(INITIAL_DATE);
+    displayTasks(INITIAL_DATE);
+
     const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
       if (Platform.OS === 'android') {
         bottomSheetModalRef.current?.snapToIndex(1);
@@ -217,12 +220,12 @@ const Calendar = ({ route }) => {
     return(
       <Menu visible={menusVisible[rowData.index]} onDismiss={() => { menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); }} anchor={
 
-        <TouchableRipple style={{flex:1, marginTop: -11}} onLongPress={() => { menusVisible[rowData.index] = true; setMenusVisible([...menusVisible]); }}>
+        <TouchableRipple style={{flex:1, marginTop: -9.3}} onLongPress={() => { menusVisible[rowData.index] = true; setMenusVisible([...menusVisible]); }}>
           <>
             <View style={{ display: "flex", flexDirection: "row" }}>
 
               <Text style={{ fontWeight: 'bold', color: theme.grey1, marginRight: 3}}>{rowData.time}</Text>
-              <View style={{ marginTop: -2, height: 25, borderRadius: 8, backgroundColor: chipBgColor, paddingHorizontal: 6, paddingVertical: 0, minWidth: 25, display: "flex", justifyContent: "center" }}>
+              <View style={{ marginTop: -1.4, height: 25, borderRadius: 8, backgroundColor: chipBgColor, paddingHorizontal: 6, paddingVertical: 0, minWidth: 25, display: "flex", justifyContent: "center" }}>
 
                 {
                   "event" in rowData ?
@@ -268,7 +271,7 @@ const Calendar = ({ route }) => {
 
 
       {/* CALENDER VIEW */}
-      <CalendarComponent key={`${theme.colors.primary}-${calendarKey}`} markingType='dot' markedDates={marked} onDayPress={day => { setSelected(day.dateString); displayTasks(day.dateString); }} enableSwipeMonths={true} theme={{calendarBackground: theme.colors.background, selectedDayBackgroundColor: theme.colors.primaryContainer, monthTextColor: theme.colors.onBackground, arrowColor: theme.colors.onBackground, textDisabledColor: "#999999", dayTextColor: theme.colors.onBackground}}></CalendarComponent>
+      <CalendarComponent key={`${theme.colors.primary}-${calendarKey}-${tasks}-${tags}-${selected}`} markingType='dot' markedDates={marked} onDayPress={day => { setSelected(day.dateString); displayTasks(day.dateString); }} enableSwipeMonths={true} theme={{calendarBackground: theme.colors.background, selectedDayBackgroundColor: theme.colors.primaryContainer, monthTextColor: theme.colors.onBackground, arrowColor: theme.colors.onBackground, textDisabledColor: "#999999", dayTextColor: theme.colors.onBackground}}></CalendarComponent>
 
 
       {/* LIST OF TASKS FOR PICKED DAY */}
