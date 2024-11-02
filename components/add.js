@@ -1,3 +1,4 @@
+import { BottomSheetTextInput } from '@gorhom/bottom-sheet';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { DAY_OF_WEEK } from '@react-native-community/datetimepicker/src/constants';
 import React from 'react';
@@ -109,7 +110,18 @@ const AddPanel = ({ sheetRef, reload, reloadTags, defaultDate }) => {
     setPickTime(false);  // close menu
 
     if (event.type == "set") {
-      setPickedTime(`${date.getHours()}:${date.getMinutes()}`);
+      let hr = date.getHours();
+      let min = date.getMinutes();
+
+      if (date.getHours() < 10) {
+        hr = "0" + hr;
+      }
+
+      if (date.getMinutes() == 0) {
+        min = "00";
+      }
+
+      setPickedTime(`${hr}:${min}`);
       setTime(date);
     }
   }
@@ -197,7 +209,7 @@ const AddPanel = ({ sheetRef, reload, reloadTags, defaultDate }) => {
     // time
     if (time != null) {
       dateTime = date.toISOString().slice(0, 10) + time.toISOString().slice(10, time.toISOString().length);
-      dateString = dateString + ` ${time.getHours()}:${time.getMinutes()}`;
+      dateString = dateString + ` ${time.getHours() < 10 ? "0" + time.getHours() : time.getHours()}:${time.getMinutes() == 0 ? "00" : time.getMinutes()}`;
       taskDate = null;
 
       // handle reminders
@@ -247,7 +259,7 @@ const AddPanel = ({ sheetRef, reload, reloadTags, defaultDate }) => {
     }
 
     // sending task to server
-    apiAddTask(api, task);
+    apiAddTask(api, task, offlineTask);
     setTimeout(() => {
       reload();
     }, 1000);
@@ -257,11 +269,11 @@ const AddPanel = ({ sheetRef, reload, reloadTags, defaultDate }) => {
   }
 
   return(
-    <View style={{ flex: 1, width: "100%", paddingLeft: 10, paddingRight: 10, backgroundColor: theme.colors.background }}>
+    <View style={{ flex: 1, width: "100%", paddingLeft: 10, paddingRight: 10, backgroundColor: theme.colors.background}}>
 
 
       {/* TITLE AND DESCRIPTION */}
-      <TextInput onChangeText={setTitle} autoFocus={true} placeholder="What would you like to do?" style={{ marginTop: 5, marginBottom: 5, height: 30, fontSize: 20, fontWeight: "bold", color: theme.colors.onBackground }} placeholderTextColor={theme.colors.onBackground} />
+      <BottomSheetTextInput  onChangeText={setTitle} placeholder="What would you like to do?" style={{ marginTop: 5, marginBottom: 5, height: 30, fontSize: 20, fontWeight: "bold", color: theme.colors.onBackground }} placeholderTextColor={theme.colors.onBackground} />
       <TextInput onChangeText={setDescription} placeholder="Description" style={{ height: 20, fontSize: 16, color: theme.colors.onBackground }} placeholderTextColor={theme.colors.onBackground}></TextInput>
 
       {/* TAGS */}
@@ -293,13 +305,13 @@ const AddPanel = ({ sheetRef, reload, reloadTags, defaultDate }) => {
       </View>
 
       {/* TOP ROW */}
-      <View style={{ flexDirection: "row", marginTop: 12 }}>
+      <View style={{ flexDirection: "row", marginTop: 12, width: "100%", alignContent: "space-between", alignSelf: "center", gap: 6 }}>
 
         {/* DATE */}
-        <Button onPress={() => { setPickDate(true); }} icon="calendar" mode="outlined" style={{ width: 114, borderRadius: 10, marginRight: 4 }}>{pickedDate}</Button>
+        <Button onPress={() => { setPickDate(true); }} icon="calendar" mode="outlined" style={{ width: 107, borderRadius: 10 }}>{pickedDate}</Button>
 
         {/* TASK/EVENT BUTTON */}
-        <Button onPress={() => { setEvent(!event); }} icon={event ? "calendar-alert" : "checkbox-marked-circle-outline"} mode="outlined" style={{ width: 114, borderRadius: 10, marginRight: 2, marginLeft: 2 }}>{event ? "Event" : "Task"}</Button>
+        <Button onPress={() => { setEvent(!event); }} icon={event ? "calendar-alert" : "checkbox-marked-circle-outline"} mode="outlined" style={{ width: 107, borderRadius: 10 }}>{event ? "Event" : "Task"}</Button>
 
         {/* PRIORITY PICKER */}
         <Menu
@@ -307,7 +319,7 @@ const AddPanel = ({ sheetRef, reload, reloadTags, defaultDate }) => {
           visible={priorityMenuVisible}
           onDismiss={closePriorityMenu}
           anchor={
-            <Button onPress={openPriorityMenu} icon="flag-triangle" mode="outlined" style={{ width: 114, borderRadius: 10, marginLeft: 4}} theme={{ colors: { primary: priorityColor } }}>{priorityText}</Button>
+            <Button onPress={openPriorityMenu} icon="flag-triangle" mode="outlined" style={{ width: 107, borderRadius: 10 }} theme={{ colors: { primary: priorityColor } }}>{priorityText}</Button>
         }>
 
           <Menu.Item onPress={() => { setPriority(4); setPriorityText("High IV"); setPriorityColor(colors.priority_4); closePriorityMenu(); }} title="High Priority" />
@@ -321,10 +333,10 @@ const AddPanel = ({ sheetRef, reload, reloadTags, defaultDate }) => {
 
 
       {/* SECOND ROW */}
-      <View style={{ flexDirection: "row", marginTop: 10 }}>
+      <View style={{ flexDirection: "row", marginTop: 10, width: "100%", justifyContent: "space-between", alignSelf: "center", gap: 6 }}>
 
         {/* TIME PICKER */}
-        <Button onPress={() => { setPickTime(true); }} icon="clock-outline" mode="outlined" style={{ width: 114, borderRadius: 10, marginRight: 4 }}>{pickedTime}</Button>
+        <Button onPress={() => { setPickTime(true); }} icon="clock-outline" mode="outlined" style={{ width: 107, borderRadius: 10 }}>{pickedTime}</Button>
 
         {/* REMINDERS PICKER MENU */}
         <Menu
@@ -332,7 +344,7 @@ const AddPanel = ({ sheetRef, reload, reloadTags, defaultDate }) => {
           visible={alertsMenuVisible}
           onDismiss={closeAlertMenu}
           anchor={
-            <Button disabled={time == null ? true : false} onPress={openAlertMenu} icon="bell" mode="outlined" style={{ width: 114, borderRadius: 10, marginRight: 2, marginLeft: 2 }}>{reminderCounter == 0 ? "Alerts" : reminderCounter}</Button>
+            <Button disabled={time == null ? true : false} onPress={openAlertMenu} icon="bell" mode="outlined" style={{ width: 107, borderRadius: 10 }}>{reminderCounter == 0 ? "Alerts" : reminderCounter}</Button>
         }>
 
           {
@@ -357,7 +369,7 @@ const AddPanel = ({ sheetRef, reload, reloadTags, defaultDate }) => {
           visible={repeatMenuVisible}
           onDismiss={closeRepeatMenu}
           anchor={
-            <Button onPress={openRepeatMenu} icon="repeat" mode="outlined" style={{ width: 114, borderRadius: 10, marginLeft: 4 }}>{repeatString}</Button>
+            <Button onPress={openRepeatMenu} icon="repeat" mode="outlined" style={{ width: 107, borderRadius: 10 }}>{repeatString}</Button>
         }>
 
           <Menu.Item onPress={() => { closeRepeatMenu(); setRecurring(true); setRepeatString("every month"); }} title="Monthly" />
@@ -412,7 +424,7 @@ const AddPanel = ({ sheetRef, reload, reloadTags, defaultDate }) => {
 
         <Modal visible={createTag} onDismiss={() => { setCreateTag(false); }} contentContainerStyle={{ padding: 10, display: "flex", justifyContent: "center", alignItems: "center"}}>
 
-          <View style={{ width: "100%", backgroundColor: "white", padding: 10, borderRadius: 10, display: "flex", justifyContent: "center", alignItems: "center" }}>
+          <View style={{ width: "100%", backgroundColor: theme.colors.background, padding: 10, borderRadius: 10, display: "flex", justifyContent: "center", alignItems: "center" }}>
 
             <Text variant="titleLarge" style={{ width: "98%", textAlign: "left", marginBottom: 7, marginTop: 2 }}>Create new tag</Text>
             <MaterialTextInput value={newTagName} onChangeText={text => setNewTagName(text)} mode="outlined" label="Tag name" style={{ width: "100%" }}></MaterialTextInput>
@@ -459,19 +471,25 @@ const AddPanel = ({ sheetRef, reload, reloadTags, defaultDate }) => {
 
         <Modal visible={addCustomBox} onDismiss={() => { setAddCustomBox(false); }} contentContainerStyle={{ padding: 10, display: "flex", justifyContent: "center", alignItems: "center"}}>
 
-          <View style={{ width: "80%", backgroundColor: "white", padding: 10, borderRadius: 10, display: "flex", justifyContent: "center", alignItems: "center" }}>
+          <View style={{ width: "80%", backgroundColor: theme.colors.background, padding: 10, borderRadius: 10, display: "flex", justifyContent: "center", alignItems: "center" }}>
 
             <View style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
 
               <WheelPicker
+                selectedIndicatorStyle={{ backgroundColor: theme.colors.elevation.level3 }}
+                itemTextStyle={{ color: theme.colors.onBackground }}
+                itemStyle={{ backgroundColor: theme.colors.elevation.level0 }}
                 selectedIndex={daysBefore}
-                options={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]}
+                options={[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]}
                 onChange={(index) => setDaysBefore(index)}
               />
 
               <Text style={{ marginLeft: 10, marginRight: 10 }}>days</Text>
 
               <WheelPicker
+                selectedIndicatorStyle={{ backgroundColor: theme.colors.elevation.level3 }}
+                itemTextStyle={{ color: theme.colors.onBackground }}
+                itemStyle={{ backgroundColor: theme.colors.elevation.level0 }}
                 selectedIndex={customHours}
                 options={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]}
                 onChange={(index) => setCustomHours(index)}
@@ -480,6 +498,9 @@ const AddPanel = ({ sheetRef, reload, reloadTags, defaultDate }) => {
               <Text style={{ marginLeft: 5, marginRight: 5 }}>:</Text>
 
               <WheelPicker
+                selectedIndicatorStyle={{ backgroundColor: theme.colors.elevation.level3 }}
+                itemTextStyle={{ color: theme.colors.onBackground }}
+                itemStyle={{ backgroundColor: theme.colors.elevation.level0 }}
                 selectedIndex={customMinutes}
                 options={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59]}
                 onChange={(index) => setCustomMinutes(index)}

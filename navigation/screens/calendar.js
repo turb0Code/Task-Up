@@ -1,6 +1,6 @@
 import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import React from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Keyboard, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { Calendar as CalendarComponent } from 'react-native-calendars';
 import { Chip, FAB, Icon, Menu, Text, TouchableRipple, useTheme } from 'react-native-paper';
 import Timeline from 'react-native-timeline-flatlist';
@@ -33,6 +33,7 @@ const Calendar = ({ route }) => {
   tasks = timelineArrange(tasks);
 
   // CALENDAR
+  const [calendarKey, setCalendarKey] = React.useState(true);
   const INITIAL_DATE = new Date().toISOString().substring(0, 10);
   const [selected, setSelected] = React.useState(INITIAL_DATE);
 
@@ -62,8 +63,23 @@ const Calendar = ({ route }) => {
   //ADD TASK MODAL
   const [addTask, setAddTask] = React.useState(false);
   let [addTaskDate, setAddTaskDate] = React.useState(new Date());
-  const snapPoints = React.useMemo(() => ['57%'], []);
+  const snapPoints = React.useMemo(() => ['40%', '65%'], []);
   const bottomSheetModalRef = React.useRef(null);
+  const editSheetModalRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
+      if (Platform.OS === 'android') {
+        bottomSheetModalRef.current?.snapToIndex(1);
+      }
+    });
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+      bottomSheetModalRef.current?.snapToIndex(0);
+    });
+    return () => {
+      showSubscription.remove();
+    };
+  }, []);
 
   const addNewTask = () => {
     bottomSheetModalRef.current?.present();
@@ -95,7 +111,7 @@ const Calendar = ({ route }) => {
     if (dates.includes(date)) {
       setPresentedTasks(<Text variant="titleLarge">Found tasks</Text>);
 
-      if (tasks[1][0].date == date) {
+      if (tasks[1].length != 0 && tasks[1][0].date == date) {
         setPresentedTasks(tasks[1]);
         return;
       }
@@ -238,12 +254,12 @@ const Calendar = ({ route }) => {
     <>
 
       {/* FILTER PANEL */}
-      <View style={{ display: "flex", flexDirection: "row", marginBottom: 0, marginTop: 2 }}>
+      <View style={{ display: "flex", flexDirection: "row", marginBottom: 0, marginTop: 5 }}>
         <ScrollView horizontal>
           {
             Object.keys(tags).filter(key => key != "EVENT" && key != "REMINDER").map((key, index) => {
               return(
-                <Chip key={index} style={{ alignSelf: "flex-start", marginRight: 2, marginLeft: 2, borderColor: colors[tags[key]], borderStyle: "solid", borderWidth: 2, backgroundColor: `${key == filter ? colors[tags[key]] : theme.colors.background}` }} onPress={() => key == filter ? setFilter("") : setFilter(key)} textStyle={{ color: theme.colors.onBackground }}>{key}</Chip>
+                <Chip key={index} style={{ alignSelf: "flex-start", marginRight: 2, marginLeft: 2, borderColor: colors[tags[key]], borderStyle: "solid", borderWidth: 2, backgroundColor: `${key == filter ? colors[tags[key]] : theme.colors.background}` }} onPress={() => { key == filter ? setFilter("") : setFilter(key); setCalendarKey(!calendarKey); }} textStyle={{ color: theme.colors.onBackground }}>{key}</Chip>
               );
             })
           }
@@ -252,7 +268,7 @@ const Calendar = ({ route }) => {
 
 
       {/* CALENDER VIEW */}
-      <CalendarComponent key={theme.colors.primary} markingType='dot' markedDates={marked} onDayPress={day => { setSelected(day.dateString); displayTasks(day.dateString); }} enableSwipeMonths={true} theme={{calendarBackground: theme.colors.background, selectedDayBackgroundColor: theme.colors.primaryContainer, monthTextColor: theme.colors.onBackground, arrowColor: theme.colors.onBackground, textDisabledColor: "#999999", dayTextColor: theme.colors.onBackground}}></CalendarComponent>
+      <CalendarComponent key={`${theme.colors.primary}-${calendarKey}`} markingType='dot' markedDates={marked} onDayPress={day => { setSelected(day.dateString); displayTasks(day.dateString); }} enableSwipeMonths={true} theme={{calendarBackground: theme.colors.background, selectedDayBackgroundColor: theme.colors.primaryContainer, monthTextColor: theme.colors.onBackground, arrowColor: theme.colors.onBackground, textDisabledColor: "#999999", dayTextColor: theme.colors.onBackground}}></CalendarComponent>
 
 
       {/* LIST OF TASKS FOR PICKED DAY */}
@@ -274,7 +290,7 @@ const Calendar = ({ route }) => {
 
 
       {/* TASK ADD BUTTON */}
-      <FAB icon="plus" style={styles.fab}/>
+      <FAB onPress={() => { addNewTask(); } } icon="plus" style={styles.fab}/>
 
 
       {/* CARD FOR ADDING TASK */}
@@ -283,6 +299,10 @@ const Calendar = ({ route }) => {
           index={0}
           snapPoints={snapPoints}
           backgroundStyle={{ backgroundColor: theme.colors.background }}
+          keyboardBehavior={Platform.OS === 'ios' ? 'extend' : 'interactive'}
+          android_keyboardInputMode="adjustResize"
+          keyboardBlurBehavior="restore"
+          enableContentPanningGesture={false}
         >
         <BottomSheetView style={styles.contentContainer}>
           <AddPanel sheetRef={bottomSheetModalRef} reload={route.params.reloadTasks} reloadTags={route.params.reloadTags} defaultDate={addTaskDate}/>
@@ -312,5 +332,10 @@ const styles = StyleSheet.create({
     position: "absolute",
     alignItems: "center",
     justifyContent: "center",
-  }
+  },
+
+  contentContainer: {
+    flex: 1,
+    alignItems: 'center',
+  },
 });

@@ -1,6 +1,6 @@
 import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Keyboard, Platform, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { Chip, FAB, Icon, Menu, Snackbar, Text, TouchableRipple, useTheme } from 'react-native-paper';
 import Timeline from 'react-native-timeline-flatlist';
 import { completeTask } from '../../api/complete.js';
@@ -26,6 +26,17 @@ const TimelineComponent = ({ route }) => {
     api = a;
   });
 
+  // REFRESH CONTROL
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    setTimeout(() => {
+      route.params.reloadTasks();
+      setRefreshing(false);
+    }, 1500);
+  };
+
   // TODAY DATE
   let todayDate = new Date();
   todayDate.setHours(0, 0, 0, 0);
@@ -45,15 +56,30 @@ const TimelineComponent = ({ route }) => {
   }
   tasks = timelineArrange(tasks);  // prepares tasks to be displayed in timeline
 
+
   // all tasks divided to groups for timeline
   let overdue = tasks[0];
   let today = tasks[1];
   let future = tasks[2];
 
   // VARIABLES FOR ADD AND EDIT CARDS
-  const snapPoints = React.useMemo(() => ['57%'], []);
+  const snapPoints = React.useMemo(() => ['40%', '65%'], []);
   const bottomSheetModalRef = React.useRef(null);
   const editSheetModalRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
+      if (Platform.OS === 'android') {
+        bottomSheetModalRef.current?.snapToIndex(1);
+      }
+    });
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+      bottomSheetModalRef.current?.snapToIndex(0);
+    });
+    return () => {
+      showSubscription.remove();
+    };
+  }, []);
 
   // VISIBILITY OF SNACKBARS
   const [addVisible, setAddVisible] = useState(false);
@@ -141,7 +167,7 @@ const TimelineComponent = ({ route }) => {
         marginTop: sectionID == 0 ? 0 : 15,
       };
     }
-    else if ("overdue" in rowData) {
+    else if (rowData.overdue == true) {
       circleColor = {
         borderColor: "#a32424",
       };
@@ -265,7 +291,7 @@ const TimelineComponent = ({ route }) => {
       }>
 
         <Menu.Item onPress={() => { deleteT(rowData.id); menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); }} leadingIcon="close" title="Delete" />
-        <Menu.Item onPress={() => { setTaskToEdit(rowData); taskToEdit = rowData; console.log(taskToEdit); menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); editSheetModalRef.current?.present(); }} leadingIcon="square-edit-outline" title="Edit" />
+        <Menu.Item onPress={() => { setTaskToEdit(rowData); taskToEdit = rowData; menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); editSheetModalRef.current?.present(); }} leadingIcon="square-edit-outline" title="Edit" />
 
       </Menu>
     );
@@ -276,7 +302,7 @@ const TimelineComponent = ({ route }) => {
 
 
       {/* FILTER PANEL */}
-      <View style={{ display: "flex", flexDirection: "row", marginBottom: 9, marginTop: 2 }}>
+      <View style={{ display: "flex", flexDirection: "row", marginBottom: 9, marginTop: 5 }}>
         <ScrollView horizontal>
 
           {
@@ -291,7 +317,14 @@ const TimelineComponent = ({ route }) => {
       </View>
 
 
-      <ScrollView>
+      <ScrollView refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={['grey']}
+          progressBackgroundColor={darkMode ? 'black' : 'white'}
+        />
+      }>
 
       {/* OVERDUE TASKS */}
       {
@@ -374,6 +407,10 @@ const TimelineComponent = ({ route }) => {
           index={0}
           snapPoints={snapPoints}
           backgroundStyle={{ backgroundColor: theme.colors.background }}
+          keyboardBehavior={Platform.OS === 'ios' ? 'extend' : 'interactive'}
+          android_keyboardInputMode="adjustResize"
+          keyboardBlurBehavior="restore"
+          enableContentPanningGesture={false}
         >
         <BottomSheetView style={styles.contentContainer}>
           <AddPanel sheetRef={bottomSheetModalRef} reload={route.params.reloadTasks} reloadTags={route.params.reloadTags} defaultDate={addTaskDate}/>

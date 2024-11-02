@@ -48,7 +48,7 @@ export const timelineArrange = (tasks) => {
   let idx = -1;
 
   tasksLists[0] = tasksLists[0].map(overdue => {
-    let tasks = transfromTasks(overdue, idx);
+    let tasks = transfromTasks(overdue, idx, true);
     idx = tasks[tasks.length - 1].index;
     return tasks;
   });
@@ -80,12 +80,12 @@ export const timelineArrange = (tasks) => {
     } ];
   });
 
-  tasksLists[2] = tasksLists[2].map(tasks => { return transfromTasks(tasks, idx); });
+  tasksLists[2] = tasksLists[2].map(tasks => { return transfromTasks(tasks, idx, false); });
 
   return tasksLists;
 }
 
-const transfromTasks = (tasks, idx) => {
+const transfromTasks = (tasks, idx, overdue) => {
   return tasks.flatMap((task, index) => {
     idx++;
     if (index == 0) {
@@ -94,7 +94,7 @@ const transfromTasks = (tasks, idx) => {
         return [ {
           dateChange: true,
           date: date.toLocaleDateString('en-US', {weekday: 'short', day: 'numeric', month: 'short'}),
-          overdue: true,
+          overdue: overdue,
           normalDate: date
         }, {
           id: task.id,
@@ -105,14 +105,14 @@ const transfromTasks = (tasks, idx) => {
           description: task.description,
           tags: task.labels.filter(tag => tag != "EVENT"),
           priority: task.priority,
-          overdue: true,
+          overdue: overdue,
           event: true
         } ];
       }
       return [ {
         dateChange: true,
         date: date.toLocaleDateString('en-US', {weekday: 'short', day: 'numeric', month: 'short'}),
-        overdue: true,
+        overdue: overdue,
         normalDate: date
       }, {
         id: task.id,
@@ -123,7 +123,7 @@ const transfromTasks = (tasks, idx) => {
         description: task.description,
         tags: task.labels.filter(tag => tag != "EVENT"),
         priority: task.priority,
-        overdue: true,
+        overdue: overdue,
       } ];
     }
     if (task.labels.includes("EVENT")) {
@@ -136,7 +136,7 @@ const transfromTasks = (tasks, idx) => {
           description: task.description,
           tags: task.labels.filter(tag => tag != "EVENT"),
           priority: task.priority,
-          overdue: true,
+          overdue: overdue,
           event: true
         } ];
       }
@@ -149,7 +149,7 @@ const transfromTasks = (tasks, idx) => {
         description: task.description,
         tags: task.labels,
         priority: task.priority,
-        overdue: true
+        overdue: overdue
       } ];
   });
 }

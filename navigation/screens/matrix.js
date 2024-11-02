@@ -1,6 +1,6 @@
 import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Keyboard, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { Chip, FAB, Icon, Menu, Snackbar, Surface, Text, TouchableRipple, useTheme } from 'react-native-paper';
 import { completeTask } from '../../api/complete.js';
 import { getApi } from "../../api/connect.js";
@@ -26,10 +26,24 @@ const Matrix = ({ route }) => {
   const [filter, setFilter] = useState("");
 
   // ADD TASK CARD
-  const snapPoints = React.useMemo(() => ['57%'], []);
+  const snapPoints = React.useMemo(() => ['40%', '65%'], []);
   const bottomSheetModalRef = React.useRef(null);
   const [addTask, setAddTask] = useState(false);
   let [addTaskDate, setAddTaskDate] = useState(new Date());
+
+  React.useEffect(() => {
+    const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
+      if (Platform.OS === 'android') {
+        bottomSheetModalRef.current?.snapToIndex(1);
+      }
+    });
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+      bottomSheetModalRef.current?.snapToIndex(0);
+    });
+    return () => {
+      showSubscription.remove();
+    };
+  }, []);
 
   // EDIT TASK CARD
   const editSheetModalRef = React.useRef(null);
@@ -147,7 +161,7 @@ const Matrix = ({ route }) => {
 
 
       {/* FILTER PANEL */}
-      <View style={{ display: "flex", flexDirection: "row", marginBottom: 10, marginTop: 2 }}>
+      <View style={{ display: "flex", flexDirection: "row", marginBottom: 8, marginTop: 5 }}>
         <ScrollView horizontal>
 
           {
@@ -172,7 +186,7 @@ const Matrix = ({ route }) => {
           <Surface style={[styles.box]} elevation={1}>
             <View style={{ display: "flex", flexDirection: "row", marginLeft: 5, marginTop: 5, marginBottom: 2 }}>
               <View style={{ width: 22, height: 22, backgroundColor: colors.priority_4_background, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center"}}><Icon size={20} source="roman-numeral-4" color="#000"></Icon></View>
-              <Text variant="labelLarge" style={{ color: colors.priority_4, marginLeft: 5, marginTop: 1, fontSize: 13 }}>Urgent & Important</Text>
+              <Text variant="labelLarge" style={{ color: colors.priority_4, marginLeft: 5, marginTop: 1, fontSize: 12 }}>Urgent & Important</Text>
             </View>
             { matrixTasks["uI"] == 0 || matrixTasks["uI"] === undefined ? renderTasks([], colors.priority_4) : renderTasks(matrixTasks["uI"], colors.priority_4) }
           </Surface>
@@ -181,7 +195,7 @@ const Matrix = ({ route }) => {
           <Surface style={[styles.box]} elevation={1}>
             <View style={{ display: "flex", flexDirection: "row", marginLeft: 5, marginTop: 5, marginBottom: 2 }}>
               <View style={{ width: 22, height: 22, backgroundColor: colors.priority_3_background, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center"}}><Icon size={20} source="roman-numeral-3" color="#000"></Icon></View>
-              <Text variant="labelLarge" style={{ color: colors.priority_3, marginLeft: 5, marginTop: 1, fontSize: 13 }}>Not Urgent & Important</Text>
+              <Text variant="labelLarge" style={{ color: colors.priority_3, marginLeft: 5, marginTop: 1, fontSize: 12 }}>Not Urgent & Important</Text>
             </View>
             { matrixTasks["nuI"] == 0 || matrixTasks["nuI"] === undefined ? renderTasks([], colors.priority_3) : renderTasks(matrixTasks["nuI"], colors.priority_3) }
           </Surface>
@@ -195,7 +209,7 @@ const Matrix = ({ route }) => {
           <Surface style={[styles.box]} elevation={1}>
             <View style={{ display: "flex", flexDirection: "row", marginLeft: 5, marginTop: 5, marginBottom: 2 }}>
               <View style={{ width: 22, height: 22, backgroundColor: colors.priority_2_background, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center"}}><Icon size={20} source="roman-numeral-2" color="#000"></Icon></View>
-              <Text variant="labelLarge" style={{ color: colors.priority_2, marginLeft: 5, marginTop: 1, fontSize: 13 }}>Urgent & Unimportant</Text>
+              <Text variant="labelLarge" style={{ color: colors.priority_2, marginLeft: 5, marginTop: 1, fontSize: 12 }}>Urgent & Unimportant</Text>
             </View>
             { matrixTasks["uUI"] == 0 || matrixTasks["uUI"] === undefined ? renderTasks([], colors.priority_2) : renderTasks(matrixTasks["uUI"], colors.priority_2) }
           </Surface>
@@ -204,7 +218,7 @@ const Matrix = ({ route }) => {
           <Surface style={[styles.box]} elevation={1}>
             <View style={{ display: "flex", flexDirection: "row", marginLeft: 3, marginTop: 5, marginBottom: 2 }}>
               <View style={{ width: 22, height: 22, backgroundColor: colors.priority_1_background, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center"}}><Icon size={20} source="roman-numeral-1" color="#000"></Icon></View>
-              <Text variant="labelLarge" style={{ color: colors.priority_1, marginLeft: 3, marginTop: 1, fontSize: 12 }}>Not Urgent & Unimportant</Text>
+              <Text variant="labelLarge" style={{ color: colors.priority_1, marginLeft: 3, marginTop: 1, fontSize: 11 }}>Not Urgent & Unimportant</Text>
             </View>
             { matrixTasks["nuUI"] == 0 || matrixTasks["nuUI"] === undefined ? renderTasks([], colors.priority_1) : renderTasks(matrixTasks["nuUI"], colors.priority_1) }
           </Surface>
@@ -228,6 +242,10 @@ const Matrix = ({ route }) => {
           index={0}
           snapPoints={snapPoints}
           backgroundStyle={{ backgroundColor: theme.colors.background }}
+          keyboardBehavior={Platform.OS === 'ios' ? 'extend' : 'interactive'}
+          android_keyboardInputMode="adjustResize"
+          keyboardBlurBehavior="restore"
+          enableContentPanningGesture={false}
         >
         <BottomSheetView style={[styles.contentContainer]}>
           <AddPanel sheetRef={bottomSheetModalRef} reload={route.params.reloadTasks} reloadTags={route.params.reloadTags} defaultDate={addTaskDate}/>
@@ -241,6 +259,10 @@ const Matrix = ({ route }) => {
           index={0}
           snapPoints={snapPoints}
           backgroundStyle={{ backgroundColor: theme.colors.background }}
+          keyboardBehavior={Platform.OS === 'ios' ? 'extend' : 'interactive'}
+          android_keyboardInputMode="adjustResize"
+          keyboardBlurBehavior="restore"
+          enableContentPanningGesture={false}
         >
         <BottomSheetView style={styles.contentContainer}>
           <EditPanel sheetRef={editSheetModalRef} reload={route.params.reloadTasks} reloadTags={route.params.reloadTags} task={taskToEdit}/>

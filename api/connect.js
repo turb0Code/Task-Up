@@ -2,6 +2,9 @@ import { TodoistApi } from '@doist/todoist-api-typescript';
 import * as FileSystem from 'expo-file-system';
 import * as Network from 'expo-network';
 import * as Notifications from 'expo-notifications';
+import { apiAddTask } from './add-task';
+import { completeTask } from './complete';
+import { deleteTask } from './delete';
 
 // RETURNS CONNECTION OBJECT TO API
 export const getApi = async () => {
@@ -22,9 +25,44 @@ export const getAllTasks = async (api) => {
     let allTasks = [];
 
     if (connected) {
+
+        const addFileUri = FileSystem.documentDirectory + "add.json";
+        fileInfo = await FileSystem.getInfoAsync(addFileUri);
+        if (fileInfo.exists) {
+            let fileContent = await FileSystem.readAsStringAsync(addFileUri, { encoding: FileSystem.EncodingType.UTF8 });
+            let data = JSON.parse(fileContent);
+            data.forEach( async task => {
+                await apiAddTask(api, task, null);
+            });
+            await FileSystem.writeAsStringAsync(addFileUri, JSON.stringify([]), { encoding: FileSystem.EncodingType.UTF8 });
+        }
+
+        const deleteFileUri = FileSystem.documentDirectory + "delete.json";
+        let fileInfo = await FileSystem.getInfoAsync(deleteFileUri);
+        if (fileInfo.exists) {
+            let fileContent = await FileSystem.readAsStringAsync(deleteFileUri, { encoding: FileSystem.EncodingType.UTF8 });
+            let data = JSON.parse(fileContent);
+            data.forEach(async id => {
+                await deleteTask(api, id);
+            });
+            await FileSystem.writeAsStringAsync(deleteFileUri, JSON.stringify([]), { encoding: FileSystem.EncodingType.UTF8 });
+        }
+
+        const completeFileUri = FileSystem.documentDirectory + "complete.json";
+        fileInfo = await FileSystem.getInfoAsync(deleteFileUri);
+        if (fileInfo.exists) {
+            let fileContent = await FileSystem.readAsStringAsync(completeFileUri, { encoding: FileSystem.EncodingType.UTF8 });
+            let data = JSON.parse(fileContent);
+            data.forEach( async id => {
+                await completeTask(api, id);
+            });
+            await FileSystem.writeAsStringAsync(completeFileUri, JSON.stringify([]), { encoding: FileSystem.EncodingType.UTF8 });
+        }
+
         await api.getTasks()
             .then((tasks) => { allTasks = tasks; })
             .catch((error) => console.log(error))
+
     }
     else {
         const fileContents = await FileSystem.readAsStringAsync(tasksFileUri, { encoding: FileSystem.EncodingType.UTF8 })
@@ -38,14 +76,10 @@ export const getAllTasks = async (api) => {
     for (let i = 0; i < allTasks.length; i++) {
         if (allTasks[i].labels.includes("REMINDER")) {
 
-            console.log(allTasks[i].description);
-
             allTasks[i].labels = allTasks[i].labels.filter(label => label != "REMINDER");
             let endIndex =  allTasks[i].description.indexOf("!", 2);
             let reminders = allTasks[i].description.substring(2, endIndex).split("*");
             allTasks[i].description = allTasks[i].description.substring(endIndex+1+1);
-
-            console.log(reminders);
 
             const remindersFileUri = FileSystem.documentDirectory + "reminders.json";
             const fileInfo = await FileSystem.getInfoAsync(remindersFileUri);
@@ -57,30 +91,43 @@ export const getAllTasks = async (api) => {
 
             reminders.forEach(async (reminder) =>  {
                 let trigger = new Date();
-                trigger.setHours(Number(reminder.split("-")[1].split(":")[0]) + 2);
-                console.log(Number(reminder.split("-")[1].split(":")[0]) + 2);
-                trigger.setMinutes(Number(reminder.split("-")[1].split(":")[1]));
+
+                const [datePart, timePart] = reminder.split("-"); // Split date and time
+                const [hours, minutes] = timePart.split(":"); // Split hours and minutes
+
+                trigger.setHours(Number(hours));
+                trigger.setMinutes(Number(minutes - 1));
                 trigger.setSeconds(0);
                 trigger.setMilliseconds(0);
-                trigger.setDate(trigger.getDate() + Number(reminder.split("-")[0]));
-                let now = new Date();
-                now.setHours(Number(now.getHours() + 2));
-                let secs = Math.round((trigger.getTime() - now.getTime()) / 1000);
-                console.log(now.toISOString());
-                console.log(trigger.toISOString());
-                console.log(secs);
 
-                if (!jsonData.ids.includes(allTasks[i].id)) {
-                    await Notifications.scheduleNotificationAsync({
-                        content: {
-                            title: `${allTasks[i].content}`,
-                            body: "Click to open app and check task details",
-                        },
-                        trigger: { seconds: secs }
-                        // trigger
-                    });
-                    jsonData.ids.push(allTasks[i].id);
-                    await FileSystem.writeAsStringAsync(remindersFileUri, JSON.stringify(jsonData), { encoding: FileSystem.EncodingType.UTF8 });
+                trigger.setDate(trigger.getDate() + Number(reminder.split("-")[0]));
+                let month = trigger.getMonth() + 1;
+
+                let seconds = getSecondsUntilDate({
+                    month: month,
+                    day: trigger.getDate(),
+                    hour: trigger.getHours(),
+                    minute: trigger.getMinutes(),
+                })
+
+                if (trigger < new Date) {
+                    console.log("Cancelled notification because trigger is before today");
+                } else {
+                    if (!jsonData.ids.includes(allTasks[i].id)) {
+                        await Notifications.scheduleNotificationAsync({
+                            content: {
+                                title: `${allTasks[i].content}`,
+                                body: "Click to open app and check task details",
+                            },
+                            trigger: {
+                                seconds: seconds,
+                                repeats: false
+                            }
+                        });
+                        console.log("CREATED NOTIFICATION");
+                        jsonData.ids.push(allTasks[i].id);
+                        await FileSystem.writeAsStringAsync(remindersFileUri, JSON.stringify(jsonData), { encoding: FileSystem.EncodingType.UTF8 });
+                    }
                 }
             });
 
@@ -110,3 +157,16 @@ export const getAllTasks = async (api) => {
 
     return allTasks;
 }
+
+const getSecondsUntilDate = ({ day, month, hour, minute }) => {
+    const now = new Date();
+    let date = new Date(now.getFullYear(), month - 1, day, hour, minute, 0);
+    let diff = date.getTime() - now.getTime();
+    if (diff > 0) {
+      return Math.floor(diff / 1000);
+    } else {
+      date = new Date(now.getFullYear() + 1, month, day, hour, minute);
+      diff = date.getTime() - now.getTime();
+      return Math.floor(diff / 1000);
+    }
+};
