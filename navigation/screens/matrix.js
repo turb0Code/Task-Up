@@ -188,7 +188,9 @@ const Matrix = ({ route }) => {
               <View style={{ width: 22, height: 22, backgroundColor: colors.priority_4_background, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center"}}><Icon size={20} source="roman-numeral-4" color="#000"></Icon></View>
               <Text variant="labelLarge" style={{ color: colors.priority_4, marginLeft: 5, marginTop: 1, fontSize: 12 }}>Urgent & Important</Text>
             </View>
-            { matrixTasks["uI"] == 0 || matrixTasks["uI"] === undefined ? renderTasks([], colors.priority_4) : renderTasks(matrixTasks["uI"], colors.priority_4) }
+            <ScrollView>
+              { matrixTasks["uI"] == 0 || matrixTasks["uI"] === undefined ? renderTasks([], colors.priority_4) : renderTasks(matrixTasks["uI"], colors.priority_4) }
+            </ScrollView>
           </Surface>
 
           {/* NOT URGENT & IMPORTANT */}
@@ -197,7 +199,9 @@ const Matrix = ({ route }) => {
               <View style={{ width: 22, height: 22, backgroundColor: colors.priority_3_background, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center"}}><Icon size={20} source="roman-numeral-3" color="#000"></Icon></View>
               <Text variant="labelLarge" style={{ color: colors.priority_3, marginLeft: 5, marginTop: 1, fontSize: 12 }}>Not Urgent & Important</Text>
             </View>
-            { matrixTasks["nuI"] == 0 || matrixTasks["nuI"] === undefined ? renderTasks([], colors.priority_3) : renderTasks(matrixTasks["nuI"], colors.priority_3) }
+            <ScrollView>
+              { matrixTasks["nuI"] == 0 || matrixTasks["nuI"] === undefined ? renderTasks([], colors.priority_3) : renderTasks(matrixTasks["nuI"], colors.priority_3) }
+            </ScrollView>
           </Surface>
 
         </View>
@@ -211,7 +215,9 @@ const Matrix = ({ route }) => {
               <View style={{ width: 22, height: 22, backgroundColor: colors.priority_2_background, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center"}}><Icon size={20} source="roman-numeral-2" color="#000"></Icon></View>
               <Text variant="labelLarge" style={{ color: colors.priority_2, marginLeft: 5, marginTop: 1, fontSize: 12 }}>Urgent & Unimportant</Text>
             </View>
-            { matrixTasks["uUI"] == 0 || matrixTasks["uUI"] === undefined ? renderTasks([], colors.priority_2) : renderTasks(matrixTasks["uUI"], colors.priority_2) }
+            <ScrollView>
+              { matrixTasks["uUI"] == 0 || matrixTasks["uUI"] === undefined ? renderTasks([], colors.priority_2) : renderTasks(matrixTasks["uUI"], colors.priority_2) }
+            </ScrollView>
           </Surface>
 
           {/* NOT URGENT & UNIMPORTANT */}
@@ -220,7 +226,9 @@ const Matrix = ({ route }) => {
               <View style={{ width: 22, height: 22, backgroundColor: colors.priority_1_background, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center"}}><Icon size={20} source="roman-numeral-1" color="#000"></Icon></View>
               <Text variant="labelLarge" style={{ color: colors.priority_1, marginLeft: 3, marginTop: 1, fontSize: 11 }}>Not Urgent & Unimportant</Text>
             </View>
-            { matrixTasks["nuUI"] == 0 || matrixTasks["nuUI"] === undefined ? renderTasks([], colors.priority_1) : renderTasks(matrixTasks["nuUI"], colors.priority_1) }
+            <ScrollView>
+              { matrixTasks["nuUI"] == 0 || matrixTasks["nuUI"] === undefined ? renderTasks([], colors.priority_1) : renderTasks(matrixTasks["nuUI"], colors.priority_1) }
+            </ScrollView>
           </Surface>
 
         </View>
@@ -288,6 +296,7 @@ const styles = StyleSheet.create({
     box: {
       width: "46.5%",
       borderRadius: 6,
+      paddingBottom: 5
     },
 
     circle: {
