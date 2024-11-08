@@ -72,6 +72,14 @@ export const getAllTasks = async (api) => {
 
     await FileSystem.writeAsStringAsync(tasksFileUri, JSON.stringify(allTasks), { encoding: FileSystem.EncodingType.UTF8 });
 
+    const remindersFileUri = FileSystem.documentDirectory + "reminders.json";
+    const fileInfo = await FileSystem.getInfoAsync(remindersFileUri);
+    let jsonData = { ids: [] }
+    if (fileInfo.exists) {
+        const fileContents = await FileSystem.readAsStringAsync(remindersFileUri, { encoding: FileSystem.EncodingType.UTF8 })
+        jsonData = JSON.parse(fileContents);
+    }
+
     let index = 0;
     for (let i = 0; i < allTasks.length; i++) {
         if (allTasks[i].labels.includes("REMINDER")) {
@@ -80,14 +88,6 @@ export const getAllTasks = async (api) => {
             let endIndex =  allTasks[i].description.indexOf("!", 2);
             let reminders = allTasks[i].description.substring(2, endIndex).split("*");
             allTasks[i].description = allTasks[i].description.substring(endIndex+1+1);
-
-            const remindersFileUri = FileSystem.documentDirectory + "reminders.json";
-            const fileInfo = await FileSystem.getInfoAsync(remindersFileUri);
-            let jsonData = { ids: [] }
-            if (fileInfo.exists) {
-                const fileContents = await FileSystem.readAsStringAsync(remindersFileUri, { encoding: FileSystem.EncodingType.UTF8 })
-                jsonData = JSON.parse(fileContents);
-            }
 
             reminders.forEach(async (reminder) =>  {
                 let trigger = new Date();
@@ -126,7 +126,6 @@ export const getAllTasks = async (api) => {
                         });
                         console.log("CREATED NOTIFICATION");
                         jsonData.ids.push(allTasks[i].id);
-                        await FileSystem.writeAsStringAsync(remindersFileUri, JSON.stringify(jsonData), { encoding: FileSystem.EncodingType.UTF8 });
                     }
                 }
             });
@@ -145,6 +144,8 @@ export const getAllTasks = async (api) => {
             index++;
         }
     }
+
+    await FileSystem.writeAsStringAsync(remindersFileUri, JSON.stringify(jsonData), { encoding: FileSystem.EncodingType.UTF8 });
 
 
     allTasks.sort((x, y) => {

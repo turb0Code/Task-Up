@@ -271,7 +271,7 @@ const Calendar = ({ route }) => {
 
 
       {/* CALENDER VIEW */}
-      <CalendarComponent key={`${theme.colors.primary}-${calendarKey}-${tasks}-${tags}-${selected}`} markingType='dot' markedDates={marked} onDayPress={day => { setSelected(day.dateString); displayTasks(day.dateString); }} enableSwipeMonths={true} theme={{calendarBackground: theme.colors.background, selectedDayBackgroundColor: theme.colors.primaryContainer, monthTextColor: theme.colors.onBackground, arrowColor: theme.colors.onBackground, textDisabledColor: "#999999", dayTextColor: theme.colors.onBackground}}></CalendarComponent>
+      <CalendarComponent key={`${theme.colors.primary}-${calendarKey}-${tasks}-${tags}-${selected}`} firstDay={1} markingType='dot' markedDates={marked} onDayPress={day => { setSelected(day.dateString); displayTasks(day.dateString); }} enableSwipeMonths={true} theme={{calendarBackground: theme.colors.background, selectedDayBackgroundColor: theme.colors.primaryContainer, monthTextColor: theme.colors.onBackground, arrowColor: theme.colors.onBackground, textDisabledColor: "#999999", dayTextColor: theme.colors.onBackground}}></CalendarComponent>
 
 
       {/* LIST OF TASKS FOR PICKED DAY */}
