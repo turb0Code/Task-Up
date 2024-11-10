@@ -1,4 +1,4 @@
-import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import { BottomSheetBackdrop, BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import React, { useState } from 'react';
 import { Keyboard, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { Chip, FAB, Icon, Menu, Snackbar, Surface, Text, TouchableRipple, useTheme } from 'react-native-paper';
@@ -117,7 +117,7 @@ const Matrix = ({ route }) => {
     if (tasks.length > 0) {
 
       if (!visibility.includes(true)) {
-        visibility = new Array(tasks.length).fill(false);  // 
+        visibility = new Array(tasks.length).fill(false);  //
       }
 
       return (
@@ -126,7 +126,7 @@ const Matrix = ({ route }) => {
             tasks.map((task, index) => { return(
               <Menu visible={visibility[index]} onDismiss={() => { setVisibility(visibility.map(s => false)); }} anchor={
 
-                <TouchableRipple onLongPress={() => { setVisibility(visibility.map((s, i) => i == index ? true : false)); }} key={index} style={{ display: "flex", flexDirection: "row", display: "flex", alignItems: "center", marginLeft: 9, marginBottom: 2 }}>
+                <TouchableRipple onLongPress={() => { setVisibility(visibility.map((s, i) => i == index ? true : false)); }} key={index} style={{ display: "flex", flexDirection: "row", display: "flex", alignItems: "center", marginLeft: 9, marginBottom: 2 }} onPress={() => { setTaskToEdit(task); taskToEdit = task; setVisibility(visibility.map(s => false)); editSheetModalRef.current?.present(); }}>
 
                   <>
                     <TouchableRipple onPress={() => { complete(task.id) }} style={[styles.circle, { borderColor: color, alignSelf: "flex-start", marginTop: 4 }]}><></></TouchableRipple>
@@ -140,8 +140,8 @@ const Matrix = ({ route }) => {
 
               }>
 
-                <Menu.Item onPress={() => { deleteT(rowData.id); setVisibility(visibility.map(s => false)); }} leadingIcon="close" title="Delete" />
-                <Menu.Item onPress={() => { taskToEdit = task; editSheetModalRef.current?.present(); setVisibility(visibility.map(s => false)); }} leadingIcon="square-edit-outline" title="Edit"/>
+                <Menu.Item onPress={() => { deleteT(task.id); setVisibility(visibility.map(s => false)); }} leadingIcon="close" title="Delete" />
+                <Menu.Item onPress={() => { setTaskToEdit(task); taskToEdit = task; setVisibility(visibility.map(s => false)); editSheetModalRef.current?.present(); }} leadingIcon="square-edit-outline" title="Edit"/>
 
               </Menu>
             );})
@@ -244,34 +244,38 @@ const Matrix = ({ route }) => {
       <Snackbar visible={completeVisible}>Completed task!</Snackbar>
 
 
-      {/* CARD WITH MENU FOR ADDING NEW TASK */}
+      {/* ADD TASK CARD PLACEHOLDER */}
       <BottomSheetModal
-          ref={bottomSheetModalRef}
-          index={0}
-          snapPoints={snapPoints}
-          backgroundStyle={{ backgroundColor: theme.colors.background }}
-          keyboardBehavior={Platform.OS === 'ios' ? 'extend' : 'interactive'}
-          android_keyboardInputMode="adjustResize"
-          keyboardBlurBehavior="restore"
-          enableContentPanningGesture={false}
-        >
-        <BottomSheetView style={[styles.contentContainer]}>
+        ref={bottomSheetModalRef}
+        index={0}
+        snapPoints={snapPoints}
+        backgroundStyle={{ backgroundColor: theme.colors.background }}
+        keyboardBehavior={Platform.OS === 'ios' ? 'extend' : 'interactive'}
+        android_keyboardInputMode="adjustResize"
+        keyboardBlurBehavior="restore"
+        enableContentPanningGesture={false}
+        backdropComponent={props => ( <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} opacity={0.5} enableTouchThrough={true} /> )}
+        handleIndicatorStyle={{ backgroundColor: theme.colors.onBackground, width: 60}}
+      >
+        <BottomSheetView style={styles.contentContainer}>
           <AddPanel sheetRef={bottomSheetModalRef} reload={route.params.reloadTasks} reloadTags={route.params.reloadTags} defaultDate={addTaskDate}/>
         </BottomSheetView>
       </BottomSheetModal>
 
 
-      {/* CARD WITH MENU TO EDIT TASK */}
+      {/* EDIT TASK CARD PLACEHOLDER */}
       <BottomSheetModal
-          ref={editSheetModalRef}
-          index={0}
-          snapPoints={snapPoints}
-          backgroundStyle={{ backgroundColor: theme.colors.background }}
-          keyboardBehavior={Platform.OS === 'ios' ? 'extend' : 'interactive'}
-          android_keyboardInputMode="adjustResize"
-          keyboardBlurBehavior="restore"
-          enableContentPanningGesture={false}
-        >
+        ref={editSheetModalRef}
+        index={0}
+        snapPoints={snapPoints}
+        backgroundStyle={{ backgroundColor: theme.colors.background }}
+        keyboardBehavior={Platform.OS === 'ios' ? 'extend' : 'interactive'}
+        android_keyboardInputMode="adjustResize"
+        keyboardBlurBehavior="restore"
+        enableContentPanningGesture={false}
+        backdropComponent={props => ( <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} opacity={0.5} enableTouchThrough={true} /> )}
+        handleIndicatorStyle={{ backgroundColor: theme.colors.onBackground, width: 60}}
+      >
         <BottomSheetView style={styles.contentContainer}>
           <EditPanel sheetRef={editSheetModalRef} reload={route.params.reloadTasks} reloadTags={route.params.reloadTags} task={taskToEdit}/>
         </BottomSheetView>

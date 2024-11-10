@@ -1,4 +1,4 @@
-import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import { BottomSheetBackdrop, BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import React, { useState } from 'react';
 import { Keyboard, Platform, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { Chip, FAB, Icon, Menu, Snackbar, Text, TouchableRipple, useTheme } from 'react-native-paper';
@@ -224,7 +224,7 @@ const TimelineComponent = ({ route }) => {
       return(
         <Menu visible={menusVisible[rowData.index]} onDismiss={() => { menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); }} anchor={
 
-          <TouchableRipple style={{flex:1, marginTop: sectionID == 0 ? 1 : 0}} onLongPress={() => { menusVisible[rowData.index] = true; setMenusVisible([...menusVisible]); }}>
+          <TouchableRipple style={{flex:1, marginTop: sectionID == 0 ? 1 : 0}} onLongPress={() => { menusVisible[rowData.index] = true; setMenusVisible([...menusVisible]); }} onPress={() => { setTaskToEdit(rowData); taskToEdit = rowData; menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); editSheetModalRef.current?.present(); }}>
             <>
 
             <View style={{flex:1, marginTop:-11}}>
@@ -262,7 +262,7 @@ const TimelineComponent = ({ route }) => {
     return(
       <Menu visible={menusVisible[rowData.index]} onDismiss={() => { menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); }} anchor={
 
-        <TouchableRipple style={{flex:1, marginTop: sectionID == 0 ? -10 : -10}} onLongPress={() => { menusVisible[rowData.index] = true; setMenusVisible([...menusVisible]); }}>
+        <TouchableRipple style={{flex:1, marginTop: sectionID == 0 ? -10 : -10}} onLongPress={() => { menusVisible[rowData.index] = true; setMenusVisible([...menusVisible]); }} onPress={() => { setTaskToEdit(rowData); taskToEdit = rowData; menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); editSheetModalRef.current?.present(); }}>
           <>
 
             <View style={{ display: "flex", flexDirection: "row" }}>
@@ -418,6 +418,8 @@ const TimelineComponent = ({ route }) => {
           android_keyboardInputMode="adjustResize"
           keyboardBlurBehavior="restore"
           enableContentPanningGesture={false}
+          backdropComponent={props => ( <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} opacity={0.5} enableTouchThrough={true} /> )}
+          handleIndicatorStyle={{ backgroundColor: theme.colors.onBackground, width: 60}}
         >
         <BottomSheetView style={styles.contentContainer}>
           <AddPanel sheetRef={bottomSheetModalRef} reload={route.params.reloadTasks} reloadTags={route.params.reloadTags} defaultDate={addTaskDate}/>
@@ -431,6 +433,12 @@ const TimelineComponent = ({ route }) => {
           index={0}
           snapPoints={snapPoints}
           backgroundStyle={{ backgroundColor: theme.colors.background }}
+          keyboardBehavior={Platform.OS === 'ios' ? 'extend' : 'interactive'}
+          android_keyboardInputMode="adjustResize"
+          keyboardBlurBehavior="restore"
+          enableContentPanningGesture={false}
+          backdropComponent={props => ( <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} opacity={0.5} enableTouchThrough={true} /> )}
+          handleIndicatorStyle={{ backgroundColor: theme.colors.onBackground, width: 60}}
         >
         <BottomSheetView style={styles.contentContainer}>
           <EditPanel sheetRef={editSheetModalRef} reload={route.params.reloadTasks} reloadTags={route.params.reloadTags} task={taskToEdit}/>

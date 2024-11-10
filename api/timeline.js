@@ -82,7 +82,11 @@ export const timelineArrange = (tasks) => {
     } ];
   });
 
-  tasksLists[2] = tasksLists[2].map(tasks => { return transfromTasks(tasks, idx, false); });
+  tasksLists[2] = tasksLists[2].map(future => {
+    let tasks = transfromTasks(future, idx, false);
+    idx = tasks[tasks.length - 1].index;
+    return tasks;
+  });
 
   return tasksLists;
 }

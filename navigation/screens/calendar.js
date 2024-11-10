@@ -1,13 +1,15 @@
-import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
-import React from 'react';
+import { BottomSheetBackdrop, BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
+import React, { useState } from 'react';
 import { Keyboard, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { Calendar as CalendarComponent } from 'react-native-calendars';
-import { Chip, FAB, Icon, Menu, Text, TouchableRipple, useTheme } from 'react-native-paper';
+import { Chip, FAB, Icon, Menu, Snackbar, Text, TouchableRipple, useTheme } from 'react-native-paper';
 import Timeline from 'react-native-timeline-flatlist';
+import { completeTask } from '../../api/complete.js';
 import { deleteTask } from '../../api/delete.js';
 import { timelineArrange } from "../../api/timeline.js";
 import AddPanel from "../../components/add.js";
 import { colors } from "../../components/colors.js";
+import EditPanel from '../../components/edit.js';
 import DarkMode from "../DarkMode.js";
 import TagsContext from "../Tags.js";
 import TasksContext from '../Tasks.js';
@@ -31,6 +33,22 @@ const Calendar = ({ route }) => {
     tasks = tasks.filter(t => { if (t.labels.includes(filter)) { return t; } });
   }
   tasks = timelineArrange(tasks);
+
+
+  // COMPLETE TASK
+  const [completeVisible, setCompleteVisible] = useState(false);
+
+  // function to mark task on server as completed
+  const complete = (id) => {
+    setCompleteVisible(true);
+    completeTask(api, id);
+    setTimeout(() => {
+      route.params.reloadTasks();
+    }, 1000)
+    setTimeout(() => {
+      setCompleteVisible(false);
+    }, 3000);
+  }
 
   // CALENDAR
   const [calendarKey, setCalendarKey] = React.useState(true);
@@ -185,7 +203,7 @@ const Calendar = ({ route }) => {
       return(
         <Menu visible={menusVisible[rowData.index]} onDismiss={() => { menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); }} anchor={
 
-          <TouchableRipple style={{flex:1, marginTop: 0}} onLongPress={() => { menusVisible[rowData.index] = true; setMenusVisible([...menusVisible]); }}>
+          <TouchableRipple style={{flex:1, marginTop: 0}} onLongPress={() => { menusVisible[rowData.index] = true; setMenusVisible([...menusVisible]); }} onPress={() => { setTaskToEdit(rowData); taskToEdit = rowData; menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); editSheetModalRef.current?.present(); }}>
             <>
             <View style={{ flex:1, marginTop:-11 }}>
 
@@ -220,7 +238,7 @@ const Calendar = ({ route }) => {
     return(
       <Menu visible={menusVisible[rowData.index]} onDismiss={() => { menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); }} anchor={
 
-        <TouchableRipple style={{flex:1, marginTop: -9.3}} onLongPress={() => { menusVisible[rowData.index] = true; setMenusVisible([...menusVisible]); }}>
+        <TouchableRipple style={{flex:1, marginTop: -9.3}} onLongPress={() => { menusVisible[rowData.index] = true; setMenusVisible([...menusVisible]); }} onPress={() => { setTaskToEdit(rowData); taskToEdit = rowData; menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); editSheetModalRef.current?.present(); }}>
           <>
             <View style={{ display: "flex", flexDirection: "row" }}>
 
@@ -296,9 +314,32 @@ const Calendar = ({ route }) => {
       <FAB onPress={() => { addNewTask(); } } icon="plus" style={styles.fab}/>
 
 
-      {/* CARD FOR ADDING TASK */}
+      {/* SNACKBARS */}
+      <Snackbar visible={completeVisible}>Completed task!</Snackbar>
+
+
+      {/* ADD TASK CARD PLACEHOLDER */}
       <BottomSheetModal
-          ref={bottomSheetModalRef}
+        ref={bottomSheetModalRef}
+        index={0}
+        snapPoints={snapPoints}
+        backgroundStyle={{ backgroundColor: theme.colors.background }}
+        keyboardBehavior={Platform.OS === 'ios' ? 'extend' : 'interactive'}
+        android_keyboardInputMode="adjustResize"
+        keyboardBlurBehavior="restore"
+        enableContentPanningGesture={false}
+        backdropComponent={props => ( <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} opacity={0.5} enableTouchThrough={true} /> )}
+        handleIndicatorStyle={{ backgroundColor: theme.colors.onBackground, width: 60}}
+      >
+        <BottomSheetView style={styles.contentContainer}>
+          <AddPanel sheetRef={bottomSheetModalRef} reload={route.params.reloadTasks} reloadTags={route.params.reloadTags} defaultDate={addTaskDate}/>
+        </BottomSheetView>
+      </BottomSheetModal>
+
+
+      {/* EDIT TASK CARD PLACEHOLDER */}
+      <BottomSheetModal
+          ref={editSheetModalRef}
           index={0}
           snapPoints={snapPoints}
           backgroundStyle={{ backgroundColor: theme.colors.background }}
@@ -306,9 +347,11 @@ const Calendar = ({ route }) => {
           android_keyboardInputMode="adjustResize"
           keyboardBlurBehavior="restore"
           enableContentPanningGesture={false}
+          backdropComponent={props => ( <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} opacity={0.5} enableTouchThrough={true} /> )}
+          handleIndicatorStyle={{ backgroundColor: theme.colors.onBackground, width: 60}}
         >
         <BottomSheetView style={styles.contentContainer}>
-          <AddPanel sheetRef={bottomSheetModalRef} reload={route.params.reloadTasks} reloadTags={route.params.reloadTags} defaultDate={addTaskDate}/>
+          <EditPanel sheetRef={editSheetModalRef} reload={route.params.reloadTasks} reloadTags={route.params.reloadTags} task={taskToEdit}/>
         </BottomSheetView>
       </BottomSheetModal>
 
