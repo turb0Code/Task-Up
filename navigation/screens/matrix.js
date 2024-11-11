@@ -26,7 +26,7 @@ const Matrix = ({ route }) => {
   const [filter, setFilter] = useState("");
 
   // ADD TASK CARD
-  const snapPoints = React.useMemo(() => ['40%', '65%'], []);
+  const snapPoints = React.useMemo(() => ['38%', '65%'], []);
   const bottomSheetModalRef = React.useRef(null);
   const [addTask, setAddTask] = useState(false);
   let [addTaskDate, setAddTaskDate] = useState(new Date());

@@ -63,7 +63,7 @@ const TimelineComponent = ({ route }) => {
   let future = tasks[2];
 
   // VARIABLES FOR ADD AND EDIT CARDS
-  const snapPoints = React.useMemo(() => ['40%', '65%'], []);
+  const snapPoints = React.useMemo(() => ['38%', '65%'], []);
   const bottomSheetModalRef = React.useRef(null);
   const editSheetModalRef = React.useRef(null);
 
@@ -173,7 +173,7 @@ const TimelineComponent = ({ route }) => {
       };
     }
 
-    let circleSize = 20;
+    let circleSize = 19;
     let circleStyle = {
       padding: "auto",
       display: "flex",
@@ -210,7 +210,7 @@ const TimelineComponent = ({ route }) => {
     if ("dateChange" in rowData) {
       return(
         <View style={{flex:1, marginTop: sectionID == 0 ? -17 : -3}}>
-          <Text style={{ fontWeight: 'bold', color: theme.grey}} variant="headlineMedium">{rowData.date}</Text>
+          <Text style={{ fontWeight: 'bold', color: theme.grey, fontSize: 26}}>{rowData.date}</Text>
         </View>
       );
     }
@@ -230,8 +230,8 @@ const TimelineComponent = ({ route }) => {
             <View style={{flex:1, marginTop:-11}}>
               <View style={{ display: "flex", flexDirection: "row" }}>
 
-                <Text style={{ fontWeight: 'bold', color: theme.grey1, marginRight: 3}}>{rowData.time}</Text>
-                <View style={{ marginTop: sectionID == 0 ? 0 : -2, height: 25, borderRadius: 8, backgroundColor: chipBgColor, paddingHorizontal: 6, paddingVertical: 0, minWidth: 25, display: "flex", justifyContent: "center" }}>
+                <Text style={{ fontWeight: 'bold', color: theme.grey1, marginRight: 3, fontSize: 14 }}>{rowData.time}</Text>
+                <View style={{ marginTop: sectionID == 0 ? 0 : -2, height: 22, borderRadius: 7, backgroundColor: chipBgColor, paddingHorizontal: 3, paddingVertical: 0, minWidth: 25, display: "flex", justifyContent: "center" }}>
 
                   {
                     "event" in rowData ?
@@ -242,9 +242,9 @@ const TimelineComponent = ({ route }) => {
                 </View>
               </View>
 
-              <Text style={{ fontWeight: 'bold' }} variant="titleLarge">{rowData.title}</Text>
+              <Text style={{ fontWeight: 'bold', fontSize: 20 }}>{rowData.title}</Text>
 
-              { rowData.tags.map((tag, index)=> <Chip key={index} style={{ alignSelf: "flex-start", backgroundColor: colors[tags[tag]] }} textStyle={{ color: "#000" }}>{tag}</Chip>) }
+              { rowData.tags.map((tag, index)=> <Chip key={index} compact={true} style={{ backgroundColor: colors[tags[tag]], alignSelf: "flex-start", height: 28, display: "flex", alignItems: "center", justifyContent: "center", marginTop: 4, marginBottom: 8 }} textStyle={{ color: "#000", fontSize: 14, alignSelf: "center", marginTop: "auto", marginBottom: "auto" }}>{tag}</Chip>) }
 
             </View>
 
@@ -267,24 +267,24 @@ const TimelineComponent = ({ route }) => {
 
             <View style={{ display: "flex", flexDirection: "row" }}>
 
-              <Text style={{ fontWeight: 'bold', color: theme.grey1, marginRight: 3}}>{rowData.time}</Text>
+              <Text style={{ fontWeight: 'bold', color: theme.grey1, marginRight: 3, fontSize: 14 }}>{rowData.time}</Text>
 
-              <View style={{ marginTop: sectionID == 0 ? 0 : -2, height: 25, borderRadius: 8, backgroundColor: chipBgColor, paddingHorizontal: 6, paddingVertical: 0, minWidth: 25, display: "flex", justifyContent: "center" }}>
+              <View style={{ marginTop: sectionID == 0 ? 0 : -2, height: 22, borderRadius: 7, backgroundColor: chipBgColor, paddingHorizontal: 3, paddingVertical: 0, minWidth: 25, display: "flex", justifyContent: "center" }}>
 
                 {
                   "event" in rowData ?
                     <Text variant="labelMedium" style={{ fontWeight: "bold", color: "#000" }}>EVENT</Text> :
-                    <Icon size={22} source={rowData.priority == "1" ? "roman-numeral-1" : rowData.priority == "2" ? "roman-numeral-2" : rowData.priority == "3" ? "roman-numeral-3" : "roman-numeral-4"} color="#000"></Icon>
+                    <Icon size={20} source={rowData.priority == "1" ? "roman-numeral-1" : rowData.priority == "2" ? "roman-numeral-2" : rowData.priority == "3" ? "roman-numeral-3" : "roman-numeral-4"} color="#000"></Icon>
                 }
 
               </View>
 
             </View>
 
-            <Text style={{ fontWeight: 'bold' }} variant="titleLarge">{rowData.title}</Text>
-            <Text variant="titleMedium">{rowData.description}</Text>
+            <Text style={{ fontWeight: 'bold', fontSize: 20 }}>{rowData.title}</Text>
+            <Text style={{ fontSize: 15 }}>{rowData.description}</Text>
 
-            { rowData.tags.map((tag, index) => <Chip key={index} style={{ backgroundColor: colors[tags[tag]], alignSelf: "flex-start" }} textStyle={{ color: "#000" }}>{tag}</Chip>) }
+            { rowData.tags.map((tag, index) => <Chip key={index} compact={true} style={{ backgroundColor: colors[tags[tag]], alignSelf: "flex-start", height: 28, display: "flex", alignItems: "center", justifyContent: "center", marginTop: 4, marginBottom: 8 }} textStyle={{ color: "#000", fontSize: 14, alignSelf: "center", marginTop: "auto", marginBottom: "auto" }}>{tag}</Chip>) }
 
           </>
         </TouchableRipple>
@@ -372,7 +372,7 @@ const TimelineComponent = ({ route }) => {
               if ("dateChange" in dailyTasks[0]) {
                 return(
                   <Timeline
-                    style={{ marginTop: 15, marginBottom: 2 }}
+                    style={{ marginTop: 12, marginBottom: 2 }}
                     key={`${index}-${darkMode}`}
                     innerCircle="dot"
                     dotColor={theme.colors.background}
@@ -385,8 +385,8 @@ const TimelineComponent = ({ route }) => {
               else {
                 return dailyTasks.map((task, i) => (
                   <View style={{ flexDirection: 'row' }}>
-                    <TouchableRipple style={{ padding: "auto", display: "flex", alignItems: "center", justifyContent: "center", width: 20, height: 20, borderRadius: 20 / 2, backgroundColor: theme.colors.background, borderColor: "#bbbbbb", borderStyle: "solid", borderWidth: 2, left: 22 - 20 / 2 - (2 - 1) / 2, marginTop: 6 }} onPress={() => addNewTask()}><Icon size={14} source="plus-thick" color={"#999999"}></Icon></TouchableRipple>
-                    <Text style={{ fontWeight: 700, marginLeft: 18, color: theme.additionalColors.grey1, marginTop: 2 }} key={i} variant="titleLarge"> {task.time}</Text>
+                    <TouchableRipple style={{ padding: "auto", display: "flex", alignItems: "center", justifyContent: "center", width: 20, height: 20, borderRadius: 20 / 2, backgroundColor: theme.colors.background, borderColor: "#bbbbbb", borderStyle: "solid", borderWidth: 2, left: 22 - 20 / 2 - (2 - 1) / 2, marginTop: 6 }} onPress={() => addNewTask()}><Icon size={13} source="plus-thick" color={"#999999"}></Icon></TouchableRipple>
+                    <Text style={{ fontWeight: 700, marginLeft: 18, color: theme.additionalColors.grey1, marginTop: 2, fontSize: 20 }} key={i}> {task.time}</Text>
                   </View>
                 ));
               }

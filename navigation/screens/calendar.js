@@ -81,7 +81,7 @@ const Calendar = ({ route }) => {
   //ADD TASK MODAL
   const [addTask, setAddTask] = React.useState(false);
   let [addTaskDate, setAddTaskDate] = React.useState(new Date());
-  const snapPoints = React.useMemo(() => ['40%', '65%'], []);
+  const snapPoints = React.useMemo(() => ['38%', '65%'], []);
   const bottomSheetModalRef = React.useRef(null);
   const editSheetModalRef = React.useRef(null);
 
@@ -203,13 +203,14 @@ const Calendar = ({ route }) => {
       return(
         <Menu visible={menusVisible[rowData.index]} onDismiss={() => { menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); }} anchor={
 
-          <TouchableRipple style={{flex:1, marginTop: 0}} onLongPress={() => { menusVisible[rowData.index] = true; setMenusVisible([...menusVisible]); }} onPress={() => { setTaskToEdit(rowData); taskToEdit = rowData; menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); editSheetModalRef.current?.present(); }}>
+          <TouchableRipple style={{flex:1, marginTop: sectionID == 0 ? 1 : 0}} onLongPress={() => { menusVisible[rowData.index] = true; setMenusVisible([...menusVisible]); }} onPress={() => { setTaskToEdit(rowData); taskToEdit = rowData; menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); editSheetModalRef.current?.present(); }}>
             <>
-            <View style={{ flex:1, marginTop:-11 }}>
 
+            <View style={{flex:1, marginTop:-11}}>
               <View style={{ display: "flex", flexDirection: "row" }}>
-                <Text style={{ fontWeight: 'bold', color: theme.grey1, marginRight: 3}}>{rowData.time}</Text>
-                <View style={{ marginTop: -2, height: 25, borderRadius: 8, backgroundColor: chipBgColor, paddingHorizontal: 6, paddingVertical: 0, minWidth: 25, display: "flex", justifyContent: "center" }}>
+
+                <Text style={{ fontWeight: 'bold', color: theme.grey1, marginRight: 3, fontSize: 14 }}>{rowData.time}</Text>
+                <View style={{ marginTop: sectionID == 0 ? 0 : -2, height: 22, borderRadius: 7, backgroundColor: chipBgColor, paddingHorizontal: 3, paddingVertical: 0, minWidth: 25, display: "flex", justifyContent: "center" }}>
 
                   {
                     "event" in rowData ?
@@ -220,10 +221,12 @@ const Calendar = ({ route }) => {
                 </View>
               </View>
 
-              <Text style={{ fontWeight: 'bold' }} variant="titleLarge">{rowData.title}</Text>
-              { rowData.tags.map((tag, index)=> <Chip key={index} style={{ alignSelf: "flex-start", backgroundColor: colors[tags[tag]] }} textStyle={{ color: "#000" }}>{tag}</Chip>) }
+              <Text style={{ fontWeight: 'bold', fontSize: 20 }}>{rowData.title}</Text>
+
+              { rowData.tags.map((tag, index)=> <Chip key={index} compact={true} style={{ backgroundColor: colors[tags[tag]], alignSelf: "flex-start", height: 28, display: "flex", alignItems: "center", justifyContent: "center", marginTop: 4, marginBottom: 8 }} textStyle={{ color: "#000", fontSize: 14, alignSelf: "center", marginTop: "auto", marginBottom: "auto" }}>{tag}</Chip>) }
 
             </View>
+
             </>
           </TouchableRipple>
         }>
@@ -238,27 +241,29 @@ const Calendar = ({ route }) => {
     return(
       <Menu visible={menusVisible[rowData.index]} onDismiss={() => { menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); }} anchor={
 
-        <TouchableRipple style={{flex:1, marginTop: -9.3}} onLongPress={() => { menusVisible[rowData.index] = true; setMenusVisible([...menusVisible]); }} onPress={() => { setTaskToEdit(rowData); taskToEdit = rowData; menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); editSheetModalRef.current?.present(); }}>
+        <TouchableRipple style={{flex:1, marginTop: sectionID == 0 ? -10 : -10}} onLongPress={() => { menusVisible[rowData.index] = true; setMenusVisible([...menusVisible]); }} onPress={() => { setTaskToEdit(rowData); taskToEdit = rowData; menusVisible[rowData.index] = false; setMenusVisible([...menusVisible]); editSheetModalRef.current?.present(); }}>
           <>
+
             <View style={{ display: "flex", flexDirection: "row" }}>
 
-              <Text style={{ fontWeight: 'bold', color: theme.grey1, marginRight: 3}}>{rowData.time}</Text>
-              <View style={{ marginTop: -1.4, height: 25, borderRadius: 8, backgroundColor: chipBgColor, paddingHorizontal: 6, paddingVertical: 0, minWidth: 25, display: "flex", justifyContent: "center" }}>
+              <Text style={{ fontWeight: 'bold', color: theme.grey1, marginRight: 3, fontSize: 14 }}>{rowData.time}</Text>
+
+              <View style={{ marginTop: sectionID == 0 ? 0 : -2, height: 22, borderRadius: 7, backgroundColor: chipBgColor, paddingHorizontal: 3, paddingVertical: 0, minWidth: 25, display: "flex", justifyContent: "center" }}>
 
                 {
                   "event" in rowData ?
                     <Text variant="labelMedium" style={{ fontWeight: "bold", color: "#000" }}>EVENT</Text> :
-                    <Icon size={22} source={rowData.priority == "1" ? "roman-numeral-1" : rowData.priority == "2" ? "roman-numeral-2" : rowData.priority == "3" ? "roman-numeral-3" : "roman-numeral-4"} color="#000"></Icon>
+                    <Icon size={20} source={rowData.priority == "1" ? "roman-numeral-1" : rowData.priority == "2" ? "roman-numeral-2" : rowData.priority == "3" ? "roman-numeral-3" : "roman-numeral-4"} color="#000"></Icon>
                 }
 
               </View>
 
             </View>
 
-            <Text style={{ fontWeight: 'bold' }} variant="titleLarge">{rowData.title}</Text>
-            <Text variant="titleMedium">{rowData.description}</Text>
+            <Text style={{ fontWeight: 'bold', fontSize: 20 }}>{rowData.title}</Text>
+            <Text style={{ fontSize: 15 }}>{rowData.description}</Text>
 
-            { rowData.tags.map((tag, index) => <Chip key={index} style={{ alignSelf: "flex-start", backgroundColor: colors[tags[tag]] }} textStyle={{ color: "#000" }}>{tag}</Chip>) }
+            { rowData.tags.map((tag, index) => <Chip key={index} compact={true} style={{ backgroundColor: colors[tags[tag]], alignSelf: "flex-start", height: 28, display: "flex", alignItems: "center", justifyContent: "center", marginTop: 4, marginBottom: 8 }} textStyle={{ color: "#000", fontSize: 14, alignSelf: "center", marginTop: "auto", marginBottom: "auto" }}>{tag}</Chip>) }
 
           </>
         </TouchableRipple>
