@@ -26,5 +26,6 @@ export const colors = {
     priority_2: "#0091EA",
     priority_2_background: "#80D8FF",
     priority_1: "#00C853",
-    priority_1_background: "#B9F6CA"
+    priority_1_background: "#B9F6CA",
+    event: "#ebdefa"
 };
