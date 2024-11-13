@@ -3,7 +3,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { DAY_OF_WEEK } from '@react-native-community/datetimepicker/src/constants';
 import React from 'react';
 import { TextInput, View } from 'react-native';
-import { Button, Checkbox, Chip, Divider, TextInput as MaterialTextInput, Menu, Modal, Portal, Text, TouchableRipple, useTheme } from 'react-native-paper';
+import { Button, Checkbox, Chip, Divider, Icon, TextInput as MaterialTextInput, Menu, Modal, Portal, Text, TouchableRipple, useTheme } from 'react-native-paper';
 import WheelPicker from 'react-native-wheely';
 import { apiAddTask } from '../api/add-task.js';
 import { getApi } from "../api/connect.js";
@@ -47,7 +47,7 @@ const AddPanel = ({ sheetRef, reload, reloadTags, defaultDate }) => {
   const [priorityMenuVisible, setPriorityMenuVisible] = React.useState(false);
   const [alertsMenuVisible, setAlertsMenuVisible] = React.useState(false);
   const [repeatMenuVisible, setRepeatMenuVisible] = React.useState(false);
-  let [priorityColor, setPriorityColor] = React.useState(theme.colors.primary);
+  let [priorityColor, setPriorityColor] = React.useState({main: "0, 0, 0", background: "173, 198, 255"});
 
   // REPEAT
   let [recurring, setRecurring] = React.useState(false);
@@ -87,7 +87,7 @@ const AddPanel = ({ sheetRef, reload, reloadTags, defaultDate }) => {
   let [pickTime, setPickTime] = React.useState(false);
   let [date, setDate] = React.useState(new Date());
   let [time, setTime] = React.useState(null);
-  let [pickedDate, setPickedDate] = React.useState("Date");
+  let [pickedDate, setPickedDate] = React.useState("Today");
   let [pickedTime, setPickedTime] = React.useState("Time");
   const [maxDate] = React.useState(new Date('2030'));
   const [firstDayOfWeek] = React.useState(DAY_OF_WEEK.Monday);
@@ -272,12 +272,36 @@ const AddPanel = ({ sheetRef, reload, reloadTags, defaultDate }) => {
     <View style={{ flex: 1, width: "100%", paddingLeft: 10, paddingRight: 10, backgroundColor: theme.colors.background}}>
 
 
+  {/* TIME AND PRIORITY ROW */}
+  <View style={{ display: "flex", flexDirection: "row", width: "100%", justifyContent: "space-between", marginTop: 0 }}>
+
+    {/* DATE */}
+    <Button onPress={() => { setPickDate(true); }} icon="calendar" style={{ width: "auto", borderRadius: 8, marginTop: 1.5, alignSelf: "flex-start", marginLeft: -12, paddingTop: 2 }} labelStyle={{ fontSize: 15, marginTop: 0, marginBottom: 0, marginLeft: 13, marginRight: 0 }} contentStyle={{ marginHorizontal: 0, paddingTop: 2 }}>{pickedDate}</Button>
+
+    {/* PRIORITY PICKER */}
+    <Menu
+      style={{ borderRadius: 9 }}
+      visible={priorityMenuVisible}
+      onDismiss={closePriorityMenu}
+      anchor={
+        <Chip onPress={openPriorityMenu} compact={true} icon={() => <Icon color="#000000" size={16} source="flag-triangle"></Icon>} style={{ width: "auto", borderRadius: 8, alignSelf: "flex-end", backgroundColor: `rgba(${priorityColor.background}, 0.6)`, marginTop: 0, height: 30, display: "flex", alignItems: "center", justifyContent: "center" }} textStyle={{ color: "black", marginTop: 0, marginBottom: 0 }} labelStyle={{ fontSize: 16, marginTop: 0, marginBottom: "auto", marginLeft: 12, marginRight: 0, color: "black", alignSelf: "center", padding: 0 }}>{priorityText}</Chip>
+    }>
+
+        <Menu.Item onPress={() => { setPriority(4); setPriorityText("High IV"); setPriorityColor(colors.priority_4); closePriorityMenu(); }} title="High Priority" />
+        <Menu.Item onPress={() => { setPriority(3); setPriorityText("Mid III"); setPriorityColor(colors.priority_3); closePriorityMenu(); }} title="Medium Priority" />
+        <Menu.Item onPress={() => { setPriority(2); setPriorityText("Low II"); setPriorityColor(colors.priority_2); closePriorityMenu(); }} title="Low Priority" />
+        <Menu.Item onPress={() => { setPriority(1); setPriorityText("None I"); setPriorityColor(colors.priority_1); closePriorityMenu(); }} title="No Priority" />
+      <Menu.Item onPress={() => { setEvent(!event); setPriorityText("EVENT"); setPriorityColor(colors.event); closePriorityMenu(); }} title="EVENT" />
+
+    </Menu>
+  </View>
+
       {/* TITLE AND DESCRIPTION */}
-      <BottomSheetTextInput  onChangeText={setTitle} placeholder="What would you like to do?" style={{ marginTop: 5, marginBottom: 5, height: 30, fontSize: 20, fontWeight: "bold", color: theme.colors.onBackground }} placeholderTextColor={theme.colors.onBackground} />
+      <BottomSheetTextInput  onChangeText={setTitle} placeholder="What would you like to do?" style={{ marginTop: 5, marginBottom: 0, height: 30, fontSize: 20, fontWeight: "bold", color: theme.colors.onBackground }} placeholderTextColor={theme.colors.onBackground} />
       <TextInput onChangeText={setDescription} placeholder="Description" style={{ height: 20, fontSize: 16, color: theme.colors.onBackground }} placeholderTextColor={theme.colors.onBackground}></TextInput>
 
       {/* TAGS */}
-      <View style={{ flexDirection: "row", height: 35, marginTop: 10 }}>
+      <View style={{ flexDirection: "row", height: 35, marginTop: 70, marginLeft: 0  }}>
 
         {
           pickedTags.map((tag, index) => {
@@ -299,33 +323,6 @@ const AddPanel = ({ sheetRef, reload, reloadTags, defaultDate }) => {
           }
           <Divider />
           <Menu.Item onPress={() => { setCreateTag(true); closeTagMenu(); }} title="Create tag" />
-
-        </Menu>
-
-      </View>
-
-      {/* TOP ROW */}
-      <View style={{ flexDirection: "row", marginTop: 12, width: "100%", alignContent: "space-between", alignSelf: "center", gap: 6 }}>
-
-        {/* DATE */}
-        <Button onPress={() => { setPickDate(true); }} icon="calendar" mode="outlined" style={{ width: 107, borderRadius: 10 }}>{pickedDate}</Button>
-
-        {/* TASK/EVENT BUTTON */}
-        <Button onPress={() => { setEvent(!event); }} icon={event ? "calendar-alert" : "checkbox-marked-circle-outline"} mode="outlined" style={{ width: 107, borderRadius: 10 }}>{event ? "Event" : "Task"}</Button>
-
-        {/* PRIORITY PICKER */}
-        <Menu
-          style={{ flex: 1, borderRadius: 10 }}
-          visible={priorityMenuVisible}
-          onDismiss={closePriorityMenu}
-          anchor={
-            <Button onPress={openPriorityMenu} icon="flag-triangle" mode="outlined" style={{ width: 107, borderRadius: 10 }} theme={{ colors: { primary: priorityColor } }}>{priorityText}</Button>
-        }>
-
-          <Menu.Item onPress={() => { setPriority(4); setPriorityText("High IV"); setPriorityColor(colors.priority_4); closePriorityMenu(); }} title="High Priority" />
-          <Menu.Item onPress={() => { setPriority(3); setPriorityText("Mid III"); setPriorityColor(colors.priority_3); closePriorityMenu(); }} title="Medium Priority" />
-          <Menu.Item onPress={() => { setPriority(2); setPriorityText("Low II"); setPriorityColor(colors.priority_2); closePriorityMenu(); }} title="Low Priority" />
-          <Menu.Item onPress={() => { setPriority(1); setPriorityText("None I"); setPriorityColor(colors.priority_1); closePriorityMenu(); }} title="No Priority" />
 
         </Menu>
 

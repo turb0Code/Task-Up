@@ -81,7 +81,7 @@ const Calendar = ({ route }) => {
   //ADD TASK MODAL
   const [addTask, setAddTask] = React.useState(false);
   let [addTaskDate, setAddTaskDate] = React.useState(new Date());
-  const snapPoints = React.useMemo(() => ['38%', '65%'], []);
+  const snapPoints = React.useMemo(() => ['42%', '65%'], []);
   const bottomSheetModalRef = React.useRef(null);
   const editSheetModalRef = React.useRef(null);
 
@@ -182,7 +182,7 @@ const Calendar = ({ route }) => {
     }
 
     return(
-      <TouchableRipple style={[styles.circle, circleStyle, circleColor, {backgroundColor:  theme.colors.background}]} onPress={() => complete(rowData.id)}><></></TouchableRipple>
+      <TouchableRipple style={[styles.circle, circleStyle, circleColor, {backgroundColor: theme.colors.background}]} onPress={() => complete(rowData.id)}><></></TouchableRipple>
     );
   }
 
@@ -194,9 +194,9 @@ const Calendar = ({ route }) => {
       grey1 : `${darkTheme ? "#b6b6b6" : "#616161"}`
     }
 
-    let chipBgColor = "#ebdefa"
+    let chipBgColor = colors.event;
     if (!("event" in rowData)) {
-      chipBgColor = rowData.priority == "1" ? colors.priority_1_background : rowData.priority == "2" ? colors.priority_2_background : rowData.priority == "3" ? colors.priority_3_background : colors.priority_4_background;
+      chipBgColor = rowData.priority == "1" ? colors.priority_1.background : rowData.priority == "2" ? colors.priority_2.background : rowData.priority == "3" ? colors.priority_3.background : colors.priority_4.background;
     }
 
     if (rowData.description == "") {
@@ -210,7 +210,7 @@ const Calendar = ({ route }) => {
               <View style={{ display: "flex", flexDirection: "row" }}>
 
                 <Text style={{ fontWeight: 'bold', color: theme.grey1, marginRight: 3, fontSize: 14 }}>{rowData.time}</Text>
-                <View style={{ marginTop: sectionID == 0 ? 0 : -2, height: 22, borderRadius: 7, backgroundColor: chipBgColor, paddingHorizontal: 3, paddingVertical: 0, minWidth: 25, display: "flex", justifyContent: "center" }}>
+                <View style={{ marginTop: sectionID == 0 ? 0 : -2, height: 22, borderRadius: 7, backgroundColor: `rgb(${chipBgColor})`, paddingHorizontal: 3, paddingVertical: 0, minWidth: 25, display: "flex", justifyContent: "center" }}>
 
                   {
                     "event" in rowData ?
@@ -248,7 +248,7 @@ const Calendar = ({ route }) => {
 
               <Text style={{ fontWeight: 'bold', color: theme.grey1, marginRight: 3, fontSize: 14 }}>{rowData.time}</Text>
 
-              <View style={{ marginTop: sectionID == 0 ? 0 : -2, height: 22, borderRadius: 7, backgroundColor: chipBgColor, paddingHorizontal: 3, paddingVertical: 0, minWidth: 25, display: "flex", justifyContent: "center" }}>
+              <View style={{ marginTop: sectionID == 0 ? 0 : -2, height: 22, borderRadius: 7, backgroundColor: `rgb(${chipBgColor})`, paddingHorizontal: 3, paddingVertical: 0, minWidth: 25, display: "flex", justifyContent: "center" }}>
 
                 {
                   "event" in rowData ?

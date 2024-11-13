@@ -19,13 +19,24 @@ export const colors = {
     charcoal: "#808080",
     grey: "#b8b8b8",
     taupe: "#ccac93",
-    priority_4: "#DD2C00",
-    priority_4_background: "#FF9E80",
-    priority_3: "#FFAB00",
-    priority_3_background: "#FFE57F",
-    priority_2: "#0091EA",
-    priority_2_background: "#80D8FF",
-    priority_1: "#00C853",
-    priority_1_background: "#B9F6CA",
-    event: "#ebdefa"
+    priority_4:  {
+        main: "221, 44, 0",
+        background: "255, 158, 128"
+    },
+    priority_3:  {
+        main: "255, 171, 0",
+        background: "255, 229, 127"
+    },
+    priority_2:  {
+        main: "0, 145, 234",
+        background: "128, 216, 255"
+    },
+    priority_1:  {
+        main: "0, 200, 83",
+        background: "185, 246, 202"
+    },
+    event:  {
+        main: "235, 222, 250",
+        background: "235, 222, 250"
+    }
 };

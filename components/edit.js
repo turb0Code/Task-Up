@@ -3,7 +3,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { DAY_OF_WEEK } from '@react-native-community/datetimepicker/src/constants';
 import React from 'react';
 import { TextInput, View } from 'react-native';
-import { Button, Checkbox, Chip, Divider, TextInput as MaterialTextInput, Menu, Modal, Portal, Text, TouchableRipple, useTheme } from 'react-native-paper';
+import { Button, Checkbox, Chip, Divider, Icon, TextInput as MaterialTextInput, Menu, Modal, Portal, Text, TouchableRipple, useTheme } from 'react-native-paper';
 import WheelPicker from 'react-native-wheely';
 import TagsContext from '../navigation/Tags.js';
 import { colors } from './colors.js';
@@ -126,18 +126,18 @@ const EditPanel = ({ sheetRef, reload, reloadTags, task }) => {
 
 
       {/* TIME AND PRIORITY ROW */}
-      <View style={{ display: "flex", flexDirection: "row", width: "100%", justifyContent: "space-between", marginTop: 5 }}>
+      <View style={{ display: "flex", flexDirection: "row", width: "100%", justifyContent: "space-between", marginTop: 0 }}>
 
         {/* DATE */}
-        <Button onPress={() => { setPickDate(true); }} icon={() => <Icon source="calendar"></Icon>} style={{ width: "auto", borderRadius: 8, marginTop: 0, alignSelf: "flex-start" }} labelStyle={{ fontSize: 15, marginTop: 0, marginBottom: 0, marginLeft: 13, marginRight: 0 }} contentStyle={{ marginHorizontal: 0 }}>{pickedDate}</Button>
+        <Button onPress={() => { setPickDate(true); }} icon="calendar" style={{ width: "auto", borderRadius: 8, marginTop: 1.5, alignSelf: "flex-start", marginLeft: -12, paddingTop: 2 }} labelStyle={{ fontSize: 15, marginTop: 0, marginBottom: 0, marginLeft: 13, marginRight: 0 }} contentStyle={{ marginHorizontal: 0, paddingTop: 2 }}>{pickedDate}</Button>
 
         {/* PRIORITY PICKER */}
         <Menu
-          style={{ borderRadius: 10 }}
+          style={{ borderRadius: 9 }}
           visible={priorityMenuVisible}
           onDismiss={closePriorityMenu}
           anchor={
-            <Button onPress={openPriorityMenu} icon="flag-triangle" style={{ width: "auto", borderRadius: 8, alignSelf: "flex-end", marginLeft: 20 }} theme={{ colors: { primary: priorityColor } }} labelStyle={{ fontSize: 15, marginTop: 0, marginBottom: 0, marginLeft: 13, marginRight: 0 }}>{priorityText}</Button>
+            <Chip onPress={openPriorityMenu} compact={true} icon={() => <Icon color="#000000" size={16} source="flag-triangle"></Icon>} style={{ width: "auto", borderRadius: 8, alignSelf: "flex-end", backgroundColor: `rgba(${priorityColor.background}, 0.6)`, marginTop: 0, height: 30, display: "flex", alignItems: "center", justifyContent: "center" }} textStyle={{ color: "black", marginTop: 0, marginBottom: 0 }} labelStyle={{ fontSize: 16, marginTop: 0, marginBottom: "auto", marginLeft: 12, marginRight: 0, color: "black", alignSelf: "center", padding: 0 }}>{priorityText}</Chip>
         }>
 
           <Menu.Item onPress={() => { setPriority(4); setPriorityText("High IV"); setPriorityColor(colors.priority_4); closePriorityMenu(); }} title="High Priority" />
@@ -150,11 +150,11 @@ const EditPanel = ({ sheetRef, reload, reloadTags, task }) => {
       </View>
 
       {/* TITLE AND DESCRIPTION */}
-      <BottomSheetTextInput value={title} onChangeText={setTitle} placeholder="What would you like to do?" style={{ marginTop: 5, marginBottom: 5, height: 30, fontSize: 20, fontWeight: "bold", color: theme.colors.onBackground }} placeholderTextColor={theme.colors.onBackground} />
+      <BottomSheetTextInput value={title} onChangeText={setTitle} placeholder="What would you like to do?" style={{ marginTop: 3, marginBottom: 0, height: 30, fontSize: 20, fontWeight: "bold", color: theme.colors.onBackground }} placeholderTextColor={theme.colors.onBackground} />
       <TextInput value={description} onChangeText={setDescription} placeholder="Description" style={{ height: 20, fontSize: 16, color: theme.colors.onBackground }} placeholderTextColor={theme.colors.onBackground}></TextInput>
 
       {/* TAGS */}
-      <View style={{ flexDirection: "row", height: 35, marginTop: 40 }}>
+      <View style={{ flexDirection: "row", height: 35, marginTop: 70, marginLeft: 0 }}>
 
         {
           pickedTags.map((tag, index) => {
