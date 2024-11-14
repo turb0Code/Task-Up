@@ -66,7 +66,8 @@ export const timelineArrange = (tasks) => {
         tags: task.labels.filter(tag => tag != "EVENT"),
         priority: task.priority,
         event: true,
-        today: true
+        today: true,
+        overdue: false
       } ];
     }
     return [ {
@@ -78,7 +79,8 @@ export const timelineArrange = (tasks) => {
       description: task.description,
       tags: task.labels,
       priority: task.priority,
-      today: true
+      today: true,
+      overdue: false
     } ];
   });
 

@@ -112,6 +112,7 @@ const Calendar = ({ route }) => {
   let [menusVisible, setMenusVisible] = React.useState(new Array(20).fill(false));
   const [presentedTasks, setPresentedTasks] = React.useState(null);
   let [taskToEdit, setTaskToEdit] = React.useState({});
+  const [deleteVisible, setDeleteVisible] = React.useState(false);
 
   // function to delete task on server by id
   const deleteT = (id) => {
@@ -194,7 +195,7 @@ const Calendar = ({ route }) => {
       grey1 : `${darkTheme ? "#b6b6b6" : "#616161"}`
     }
 
-    let chipBgColor = colors.event;
+    let chipBgColor = colors.event.background;
     if (!("event" in rowData)) {
       chipBgColor = rowData.priority == "1" ? colors.priority_1.background : rowData.priority == "2" ? colors.priority_2.background : rowData.priority == "3" ? colors.priority_3.background : colors.priority_4.background;
     }

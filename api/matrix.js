@@ -78,7 +78,8 @@ const transformTask = (task, index) => {
             description: task.description,
             tags: task.labels.filter(tag => tag != "EVENT"),
             priority: task.priority,
-            event: true
+            event: true,
+            overdue: new Date(task.due.date) < new Date() ? true : false
         };
     }
     return {
@@ -89,6 +90,7 @@ const transformTask = (task, index) => {
         title: task.content,
         description: task.description,
         tags: task.labels,
-        priority: task.priority
+        priority: task.priority,
+        overdue: new Date(task.due.date) < new Date() ? true : false
     };
 }

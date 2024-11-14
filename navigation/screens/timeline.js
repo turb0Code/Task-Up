@@ -215,7 +215,7 @@ const TimelineComponent = ({ route }) => {
       );
     }
 
-    let chipBgColor = colors.event;
+    let chipBgColor = colors.event.background;
     if (!("event" in rowData)) {
       chipBgColor = rowData.priority == "1" ? colors.priority_1.background : rowData.priority == "2" ? colors.priority_2.background : rowData.priority == "3" ? colors.priority_3.background : colors.priority_4.background;
     }

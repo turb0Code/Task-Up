@@ -129,7 +129,7 @@ const EditPanel = ({ sheetRef, reload, reloadTags, task }) => {
       <View style={{ display: "flex", flexDirection: "row", width: "100%", justifyContent: "space-between", marginTop: 0 }}>
 
         {/* DATE */}
-        <Button onPress={() => { setPickDate(true); }} icon="calendar" style={{ width: "auto", borderRadius: 8, marginTop: 1.5, alignSelf: "flex-start", marginLeft: -12, paddingTop: 2 }} labelStyle={{ fontSize: 15, marginTop: 0, marginBottom: 0, marginLeft: 13, marginRight: 0 }} contentStyle={{ marginHorizontal: 0, paddingTop: 2 }}>{pickedDate}</Button>
+        <Button onPress={() => { setPickDate(true); }} icon="calendar" style={{ width: "auto", borderRadius: 8, marginTop: 1.5, alignSelf: "flex-start", marginLeft: -12, paddingTop: 2 }} labelStyle={{ fontSize: 15, marginTop: 0, marginBottom: 0, marginLeft: 13, marginRight: 0 }} contentStyle={{ marginHorizontal: 0, paddingTop: 2 }} textColor={task.overdue == true ? "#a32424" : theme.colors.primary}>{pickedDate}</Button>
 
         {/* PRIORITY PICKER */}
         <Menu
@@ -158,7 +158,9 @@ const EditPanel = ({ sheetRef, reload, reloadTags, task }) => {
 
         {
           pickedTags.map((tag, index) => {
-            return( <Chip key={index} onClose={() => { setPickedTags(pickedTags.filter(t => t != tag)) }} closeIcon="close" compact={true} style={{ marginRight: 5, marginTop: 2, backgroundColor: colors[tags[tag]] }}>{tag}</Chip> );
+            if (tag != "REMINDER" && tag != "EVENT") {
+              return( <Chip key={index} onClose={() => { setPickedTags(pickedTags.filter(t => t != tag)) }} closeIcon="close" compact={true} style={{ marginRight: 5, marginTop: 2, backgroundColor: colors[tags[tag]] }}>{tag}</Chip> );
+            }
           })
         }
 

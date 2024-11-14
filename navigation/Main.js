@@ -49,7 +49,7 @@ function MainView({ handleBackToLanding }) {
 
         getTags(api)
           .then((t) => { setTags(t); });
-      }, 120000)
+      }, 180000)
     });
   }, []);
 

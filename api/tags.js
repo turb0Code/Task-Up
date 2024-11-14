@@ -29,3 +29,10 @@ export const apiAddTag = (api, tag) => {
         .then((label) => console.log(label))
         .catch((error) => console.log(error))
 }
+
+// DELETE TAG ON SERVER
+export const delteTag = (api, tagId) => {
+    api.deleteLabel(tagId)
+        .then((isSuccess) => console.log(isSuccess))
+        .catch((error) => console.log(error))
+}

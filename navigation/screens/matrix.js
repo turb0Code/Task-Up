@@ -131,8 +131,8 @@ const Matrix = ({ route }) => {
                   <>
                     <TouchableRipple onPress={() => { complete(task.id) }} style={[styles.circle, { borderColor: `rgb(${color})`, alignSelf: "flex-start", marginTop: 4 }]}><></></TouchableRipple>
                     <View style={{ display: "flex", flexDirection: "column" }}>
-                      <Text variant="titleSmall" style={{ marginLeft: 5 }}>{task.title}</Text>
-                      <Text variant="labelMedium" style={{ marginLeft: 5, marginTop: -2 }}>{task.time}</Text>
+                      <Text variant="titleSmall" style={{ marginLeft: 5, color: task.overdue == true ? theme.grey1 : theme.colors.onBackground }}>{task.title}</Text>
+                      <Text variant="labelMedium" style={{ marginLeft: 5, marginTop: -2, color: task.overdue == true ? theme.grey1 : theme.colors.onBackground }}>{task.time}</Text>
                     </View>
                   </>
 
