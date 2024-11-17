@@ -306,7 +306,7 @@ const AddPanel = ({ sheetRef, reload, reloadTags, defaultDate }) => {
         {
           pickedTags.map((tag, index) => {
             if (tag != "REMINDER" && tag != "EVENT") {
-              return( <Chip key={index} onClose={() => { setPickedTags(pickedTags.filter(t => t != tag)) }} closeIcon="close" compact={true} style={{ marginRight: 5, marginTop: 2, backgroundColor: colors[tags[tag]] }}>{tag}</Chip> );
+              return( <Chip key={index} onClose={() => { setPickedTags(pickedTags.filter(t => t != tag)) }} closeIcon="close" compact={true} style={{ marginRight: 5, marginTop: 2, backgroundColor: colors[tags[tag].color] }}>{tag}</Chip> );
             }
           })
         }

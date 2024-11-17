@@ -224,7 +224,7 @@ const Calendar = ({ route }) => {
 
               <Text style={{ fontWeight: 'bold', fontSize: 20 }}>{rowData.title}</Text>
 
-              { rowData.tags.map((tag, index)=> <Chip key={index} compact={true} style={{ backgroundColor: colors[tags[tag]], alignSelf: "flex-start", height: 28, display: "flex", alignItems: "center", justifyContent: "center", marginTop: 4, marginBottom: 8 }} textStyle={{ color: "#000", fontSize: 14, alignSelf: "center", marginTop: "auto", marginBottom: "auto" }}>{tag}</Chip>) }
+              { rowData.tags.map((tag, index)=> <Chip key={index} compact={true} style={{ backgroundColor: colors[tags[tag].color], alignSelf: "flex-start", height: 28, display: "flex", alignItems: "center", justifyContent: "center", marginTop: 4, marginBottom: 8 }} textStyle={{ color: "#000", fontSize: 14, alignSelf: "center", marginTop: "auto", marginBottom: "auto" }}>{tag}</Chip>) }
 
             </View>
 
@@ -264,7 +264,7 @@ const Calendar = ({ route }) => {
             <Text style={{ fontWeight: 'bold', fontSize: 20 }}>{rowData.title}</Text>
             <Text style={{ fontSize: 15 }}>{rowData.description}</Text>
 
-            { rowData.tags.map((tag, index) => <Chip key={index} compact={true} style={{ backgroundColor: colors[tags[tag]], alignSelf: "flex-start", height: 28, display: "flex", alignItems: "center", justifyContent: "center", marginTop: 4, marginBottom: 8 }} textStyle={{ color: "#000", fontSize: 14, alignSelf: "center", marginTop: "auto", marginBottom: "auto" }}>{tag}</Chip>) }
+            { rowData.tags.map((tag, index) => <Chip key={index} compact={true} style={{ backgroundColor: colors[tags[tag].color], alignSelf: "flex-start", height: 28, display: "flex", alignItems: "center", justifyContent: "center", marginTop: 4, marginBottom: 8 }} textStyle={{ color: "#000", fontSize: 14, alignSelf: "center", marginTop: "auto", marginBottom: "auto" }}>{tag}</Chip>) }
 
           </>
         </TouchableRipple>
@@ -286,7 +286,7 @@ const Calendar = ({ route }) => {
           {
             Object.keys(tags).filter(key => key != "EVENT" && key != "REMINDER").map((key, index) => {
               return(
-                <Chip key={index} style={{ alignSelf: "flex-start", marginRight: 2, marginLeft: 2, borderColor: colors[tags[key]], borderStyle: "solid", borderWidth: 2, backgroundColor: `${key == filter ? colors[tags[key]] : theme.colors.background}` }} onPress={() => { key == filter ? setFilter("") : setFilter(key); setCalendarKey(!calendarKey); }} textStyle={{ color: theme.colors.onBackground }}>{key}</Chip>
+                <Chip key={index} style={{ alignSelf: "flex-start", marginRight: 2, marginLeft: 2, borderColor: colors[tags[key].color], borderStyle: "solid", borderWidth: 2, backgroundColor: `${key == filter ? colors[tags[key].color] : theme.colors.background}` }} onPress={() => { key == filter ? setFilter("") : setFilter(key); setCalendarKey(!calendarKey); }} textStyle={{ color: theme.colors.onBackground }}>{key}</Chip>
               );
             })
           }

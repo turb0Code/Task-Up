@@ -14,7 +14,7 @@ import TasksContext from '../Tasks.js';
 const Matrix = ({ route }) => {
 
   // THEME
-  let theme  = useTheme();
+  let theme = useTheme();
 
   // API
   let api = {};
@@ -167,7 +167,7 @@ const Matrix = ({ route }) => {
           {
             Object.keys(tags).filter(key => key != "EVENT" && key != "REMINDER").map((key, index) => {
               return(
-                <Chip key={index} style={{ alignSelf: "flex-start", marginRight: 2, marginLeft: 2, borderColor: colors[tags[key]], borderStyle: "solid", borderWidth: 2, backgroundColor: `${key == filter ? colors[tags[key]] : theme.colors.background}` }} onPress={() => key == filter ? setFilter("") : setFilter(key)} textStyle={{ color: theme.colors.onBackground }}>{key}</Chip>
+                <Chip key={index} style={{ alignSelf: "flex-start", marginRight: 2, marginLeft: 2, borderColor: colors[tags[key].color], borderStyle: "solid", borderWidth: 2, backgroundColor: `${key == filter ? colors[tags[key].color] : theme.colors.background}` }} onPress={() => key == filter ? setFilter("") : setFilter(key)} textStyle={{ color: theme.colors.onBackground }}>{key}</Chip>
               );
             })
           }

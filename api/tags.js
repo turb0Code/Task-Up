@@ -13,7 +13,7 @@ export const getAllTags = async (api) => {
     if (connected) {
         await api.getLabels()
             .then((labels) => {
-                labels.forEach(tag => { tags[tag.name] = tag.color });
+                labels.forEach(tag => { tags[tag.name] = { color: tag.color, id: tag.id } });
             })
             .catch((error) => console.log(error))
     } else { tags = jsonData; }
@@ -35,4 +35,11 @@ export const delteTag = (api, tagId) => {
     api.deleteLabel(tagId)
         .then((isSuccess) => console.log(isSuccess))
         .catch((error) => console.log(error))
+}
+
+// UPDATE TAG ON SERVER
+export const updateTag = (api, tagId, name) => {
+    api.updateLabel(tagId, { name: name })
+        .then((isSuccess) => console.log(isSuccess))
+        .catch((error) => console.log(error));
 }

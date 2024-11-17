@@ -3,6 +3,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { Button, Chip, IconButton, Snackbar, Switch, Text } from 'react-native-paper';
 import DarkMode from "../DarkMode.js";
+import TagsContext from "../Tags.js";
 
 
 const Settings = ({ route }) => {
@@ -25,6 +26,10 @@ const Settings = ({ route }) => {
 
   // DELETE TOKEN
   const [tokenDelSnack, setTokenDelSnack] = React.useState(false);
+
+  // TAGS
+  let apiTags = React.useContext(TagsContext);
+  let [tags, setTags] = React.useState(apiTags);
 
   // READ SETTINGS FROM FILE
   React.useEffect(() => {
@@ -92,6 +97,11 @@ const Settings = ({ route }) => {
 
         {/* TODO: show here tags as chips */}
         <Text variant="titleMedium" style={{ fontSize: 18 }}>Tags</Text>
+
+
+        <View>
+          { Object.keys(tags).map((tagName, index) => <Chip>{tagName}</Chip> ) }
+        </View>
 
       </View>
 

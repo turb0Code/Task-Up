@@ -150,8 +150,8 @@ const EditPanel = ({ sheetRef, reload, reloadTags, task }) => {
       </View>
 
       {/* TITLE AND DESCRIPTION */}
-      <BottomSheetTextInput value={title} onChangeText={setTitle} placeholder="What would you like to do?" style={{ marginTop: 3, marginBottom: 0, height: 30, fontSize: 20, fontWeight: "bold", color: theme.colors.onBackground }} placeholderTextColor={theme.colors.onBackground} />
-      <TextInput value={description} onChangeText={setDescription} placeholder="Description" style={{ height: 20, fontSize: 16, color: theme.colors.onBackground }} placeholderTextColor={theme.colors.onBackground}></TextInput>
+      <BottomSheetTextInput value={title} onChangeText={setTitle} placeholder="What would you like to do?" style={{ marginTop: 0, marginBottom: 0, height: 42, fontSize: 20, fontWeight: "bold", color: theme.colors.onBackground }} placeholderTextColor={theme.colors.onBackground} />
+      <TextInput value={description} onChangeText={setDescription} placeholder="Description" style={{ height: 40, fontSize: 16, color: theme.colors.onBackground }} placeholderTextColor={theme.colors.onBackground}></TextInput>
 
       {/* TAGS */}
       <View style={{ flexDirection: "row", height: 35, marginTop: 70, marginLeft: 0 }}>
@@ -159,7 +159,7 @@ const EditPanel = ({ sheetRef, reload, reloadTags, task }) => {
         {
           pickedTags.map((tag, index) => {
             if (tag != "REMINDER" && tag != "EVENT") {
-              return( <Chip key={index} onClose={() => { setPickedTags(pickedTags.filter(t => t != tag)) }} closeIcon="close" compact={true} style={{ marginRight: 5, marginTop: 2, backgroundColor: colors[tags[tag]] }}>{tag}</Chip> );
+              return( <Chip key={index} onClose={() => { setPickedTags(pickedTags.filter(t => t != tag)) }} closeIcon="close" compact={true} style={{ marginRight: 5, marginTop: 2, backgroundColor: colors[tags[tag].color] }}>{tag}</Chip> );
             }
           })
         }
