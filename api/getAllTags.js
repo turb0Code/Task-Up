@@ -7,6 +7,7 @@ export const getAllTags = async (api) => {
     const tagsFileUri = FileSystem.documentDirectory + "tags.json";
 
     let connected = (await Network.getNetworkStateAsync()).isConnected;
+    connected = false;
 
     let tags = {};
 
@@ -19,7 +20,6 @@ export const getAllTags = async (api) => {
     } else {
         tags = jsonData;
     }
-
     await FileSystem.writeAsStringAsync(tagsFileUri, JSON.stringify(tags), { encoding: FileSystem.EncodingType.UTF8 });
 
     return tags;

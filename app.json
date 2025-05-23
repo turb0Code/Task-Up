@@ -1,6 +1,8 @@
 {
   "expo": {
     "name": "Task Up!",
+    "newArchEnabled": false,
+    "usesCleartextTraffic": true,
     "slug": "task-up",
     "version": "1.0.0",
     "orientation": "portrait",
